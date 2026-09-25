@@ -1,0 +1,133 @@
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero-section {
+    padding: 100px 0;
+    text-align: center;
+}
+
+/* Плашка */
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(98, 164, 246, 0.2);
+    color: #62A4F6;
+    padding: 8px 10px;
+    border-radius: 26px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.badge-icon {
+    max-height: 24px;
+}
+
+/* Заголовок */
+.hero-title {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 100%;
+    margin-bottom: 10px;
+    letter-spacing: 0;
+}
+
+.hero-title .highlight {
+    color: #fff;
+    position: relative;
+    display: inline-block;
+    padding: 0 25px 7px;
+    z-index: 1;
+}
+
+.hero-title .highlight::before {
+    content: '';
+    position: absolute;
+    background: #000;
+    top: 10px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+}
+
+
+/* Подзаголовок */
+.hero-subtitle {
+    font-size: 16px;
+    color: #737373;
+    margin-bottom: 32px;
+    max-width: 410px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Кнопки */
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 60px;
+}
+
+/* Составная кнопка */
+.composite-btn {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0;
+    font-size: 0;
+}
+
+.composite-btn .btn {
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 20px;
+}
+
+.composite-btn .btn-composite-arrow {
+    padding: 15px 16px;
+}
+
+.composite-btn .btn-composite-arrow img {
+    display: block;
+    width: 16px;
+    height: 16px;
+}
+
+/* Стрелка вниз */
+.hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 50px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(10px); }
+}
+
+/* Видео-превью */
+.hero-video {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.video-placeholder {
+    background: #F5F5F5;
+    border-radius: 25px;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.video-placeholder:hover {
+    background: #eee;
+}

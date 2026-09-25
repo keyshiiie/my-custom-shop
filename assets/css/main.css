@@ -1,0 +1,86 @@
+/* ============================================
+   ПОДКЛЮЧЕНИЕ ШРИФТА
+   ============================================ */
+@font-face {
+    font-family: 'Manrope';
+    src: url('../fonts/manrope/Manrope-VariableFont_wght.woff2') format('woff2-variations'),
+         url('../fonts/manrope/Manrope-VariableFont_wght.woff2') format('woff2'),
+         url('../fonts/manrope/Manrope-VariableFont_wght.woff') format('woff');
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================
+   СБРОС И БАЗОВЫЕ НАСТРОЙКИ
+   ============================================ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 400;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* ============================================
+   КОНТЕЙНЕР
+   ============================================ */
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;   /* ← добавьте, иначе на мобильных контент прилипнет к краям */
+}
+
+/* ============================================
+   БАЗОВЫЙ КЛАСС КНОПКИ
+   (без размеров и отступов — они будут в секциях)
+   ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 15px 20px;   /* базовый padding */
+}
+
+.btn-dark {
+    background: #000;
+    color: #fff;
+}
+
+.btn-dark:hover {
+    background: #333;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline:hover {
+    border-color: rgba(0, 0, 0, 0.5);
+}

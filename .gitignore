@@ -1,0 +1,16 @@
+# Системный мусор
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Node (если есть)
+node_modules/
+package-lock.json
+
+# Временные файлы
+*.tmp
+*.bak
