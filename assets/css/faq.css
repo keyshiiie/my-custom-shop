@@ -1,0 +1,168 @@
+/* ============================================
+   FAQ SECTION
+   ============================================ */
+.faq-section {
+    padding: 0px 0 155px;
+}
+
+.faq-section .section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.faq-section .section-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.faq-section .section-subtitle {
+    font-size: 16px;
+    color: #737373;
+}
+
+/* ============================================
+   СПИСОК АККОРДЕОНА — единая карточка
+   ============================================ */
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 15px;
+    overflow: hidden;     
+}
+
+/* ============================================
+   ЭЛЕМЕНТ АККОРДЕОНА — без своего border
+   ============================================ */
+.faq-item {
+    background: transparent;
+    border: none;
+    position: relative;
+}
+
+.faq-item:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: #E5E5E5;
+}
+
+/* У первого элемента разделитель не нужен — он уже на границе .faq-list */
+.faq-item:first-child {
+    border-top: none;
+}
+
+/* Вопрос (summary) */
+.faq-item__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.faq-item__question::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item__question::marker {
+    display: none;
+    content: '';
+}
+
+.faq-item__question:hover {
+    color: #555;
+    background: #FAFAFA;
+}
+
+.faq-item[open] {
+    border-color: inherit;  
+}
+
+/* ============================================
+   ИКОНКА-ШЕВРОН
+   ============================================ */
+.faq-item__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+/* Рисуем шеврон через псевдоэлемент */
+.faq-item__icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #1a1a1a;
+    border-bottom: 2px solid #1a1a1a;
+    transform: translate(-50%, -70%) rotate(45deg);
+    transition: transform 0.3s ease;
+}
+
+/* При открытии — поворачиваем стрелку вверх */
+.faq-item[open] .faq-item__icon::before {
+    transform: translate(-50%, -30%) rotate(-135deg);
+}
+
+/* ============================================
+   ОТВЕТ
+   ============================================ */
+.faq-item__answer {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0 20px;
+    transition:
+        max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s ease;
+    will-change: max-height, opacity;
+}
+
+.faq-item[open] .faq-item__answer {
+    opacity: 1;
+}
+
+.faq-item__answer p {
+    margin: 0;
+    padding-bottom: 15px;   
+}
+
+.faq-item__answer p:last-child {
+    padding-bottom: 15px;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+   ============================================ */
+@media (max-width: 768px) {
+    .faq-section .section-title {
+        font-size: 32px;
+    }
+
+    .faq-item__question {
+        padding: 16px 20px;
+        font-size: 15px;
+    }
+
+    .faq-item__answer {
+        padding: 0 20px 16px;
+    }
+}

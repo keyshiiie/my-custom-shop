@@ -2,7 +2,7 @@
    HERO SECTION
    ============================================ */
 .hero-section {
-    padding: 100px 0;
+    padding: 100px 0 55px 0;
     text-align: center;
 }
 
@@ -33,14 +33,40 @@
     letter-spacing: 0;
 }
 
+/* ============================================
+   ЗАГОЛОВОК
+   ============================================ */
+.hero-title {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 100%;
+    margin-bottom: 10px;
+    letter-spacing: 0;
+}
+
+/* ============================================
+   HIGHLIGHT С АНИМАЦИЕЙ ПЛАШКИ (без blur)
+   ============================================ */
+
+/* Внешний контейнер — фиксированная ширина */
+.hero-title .highlight-wrap {
+    display: inline-block;
+    width: 340px;
+    text-align: center;
+    vertical-align: baseline;
+}
+
+/* Обёртка с чёрной плашкой */
 .hero-title .highlight {
     color: #fff;
     position: relative;
     display: inline-block;
-    padding: 0 25px 7px;
+    padding: 0 20px 7px;
     z-index: 1;
+    vertical-align: baseline;
 }
 
+/* Чёрная плашка */
 .hero-title .highlight::before {
     content: '';
     position: absolute;
@@ -50,8 +76,48 @@
     right: 0;
     bottom: 0;
     z-index: -1;
+    transition:
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    opacity: 1;
 }
 
+/* Слово внутри */
+.hero-title .highlight__word {
+    display: inline-block;
+    white-space: nowrap;
+    transition:
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    opacity: 1;
+    will-change: opacity, transform;
+}
+
+/* УХОДИТ */
+.hero-title .highlight.is-leaving::before {
+    opacity: 0;
+    transform: translateY(-14px);
+}
+
+.hero-title .highlight.is-leaving .highlight__word {
+    opacity: 0;
+    transform: translateY(-14px);
+}
+
+/* ПОЯВЛЯЕТСЯ */
+.hero-title .highlight.is-entering::before {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: none;
+}
+
+.hero-title .highlight.is-entering .highlight__word {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: none;
+}
 
 /* Подзаголовок */
 .hero-subtitle {
@@ -85,6 +151,16 @@
     border: none;
     border-radius: 12px;
     padding: 15px 20px;
+}
+
+/* Отключаем индивидуальный ховер у кнопок внутри составной */
+.composite-btn .btn-dark:hover {
+    background: #000;   /* возвращаем базовый черный, чтобы :hover не сработал */
+}
+
+/* Ховер на ВСЮ составную кнопку — меняет фон у обеих частей */
+.composite-btn:hover .btn-dark {
+    background: #333;
 }
 
 .composite-btn .btn-composite-arrow {

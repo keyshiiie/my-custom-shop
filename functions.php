@@ -57,3 +57,80 @@ function my_theme_fix_anchor_menu_links( $atts, $item, $args ) {
     return $atts;
 }
 add_filter( 'nav_menu_link_attributes', 'my_theme_fix_anchor_menu_links', 10, 3 );
+
+function my_theme_enqueue_scripts() {
+    $theme_uri = get_template_directory_uri();
+    $version   = '1.1';
+
+    // Стили секции bestsellers
+    wp_enqueue_style(
+        'bestsellers-style',
+        $theme_uri . '/assets/css/bestsellers.css',
+        array( 'base-style' ),
+        $version
+    );
+
+     // Стили секции why-us
+    wp_enqueue_style(
+        'why-us-style',
+        $theme_uri . '/assets/css/why-us.css',
+        array( 'base-style' ),
+        $version
+    );
+
+    // Стили секции FAQ
+    wp_enqueue_style(
+        'faq-style',
+        $theme_uri . '/assets/css/faq.css',
+        array( 'base-style' ),
+        $version
+    );
+
+    // Стили секции CTA
+    wp_enqueue_style(
+        'cta-style',
+        $theme_uri . '/assets/css/cta.css',
+        array( 'base-style' ),
+        $version
+    );
+
+    // Стили футера
+    wp_enqueue_style(
+        'footer-style',
+        $theme_uri . '/assets/css/footer.css',
+        array( 'base-style' ),
+        $version
+    );
+
+    // Свой слайдер
+    wp_enqueue_script(
+        'my-theme-scripts',
+        $theme_uri . '/assets/js/main.js',
+        array(),
+        $version,
+        true
+    );
+}
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_scripts' );
+
+/**
+ * Передаём ID товаров из корзины в JS
+ */
+function my_theme_cart_data_to_js() {
+    if ( ! function_exists( 'WC' ) || is_admin() ) return;
+
+    $cart_items = array();
+    if ( WC()->cart ) {
+        foreach ( WC()->cart->get_cart() as $cart_item ) {
+            $cart_items[] = $cart_item['product_id'];
+        }
+    }
+    ?>
+    <script>
+        window.wc_cart_data = {
+            items: <?php echo wp_json_encode( $cart_items ); ?>
+        };
+    </script>
+    <?php
+}
+add_action( 'wp_footer', 'my_theme_cart_data_to_js', 5 );

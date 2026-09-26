@@ -1,0 +1,169 @@
+/* ============================================
+   FOOTER
+   ============================================ */
+.site-footer {
+    background: #fff;
+    padding: 0 0 60px;
+}
+
+/* ============================================
+   ВЕРХНЯЯ ЧАСТЬ: бренд + ссылки
+   ============================================ */
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 60px;
+    margin-bottom: 40px;
+}
+
+/* Бренд */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.logo-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.footer-logo img {
+    max-height: 40px;
+    width: auto;
+    display: block;
+}
+
+.footer-logo__text {
+    font-size: 20px;
+    font-weight: 400;
+    color: #000;
+}
+
+/* Соцсети */
+.footer-socials {
+    display: flex;
+}
+
+.footer-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.footer-social:hover {
+    background: #F5F5F5;
+    color: #000;
+}
+
+.footer-social svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+/* ============================================
+   КОЛОНКИ ССЫЛОК
+   ============================================ */
+.footer-nav {
+    display: flex;
+    gap: 80px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-link {
+    font-size: 16px;
+    color: #737373;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    line-height: 1.4;
+    max-width: 166px;
+}
+
+.footer-link:hover {
+    color: #1a1a1a;
+}
+
+/* ============================================
+   НИЖНЯЯ СТРОКА
+   ============================================ */
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    color: #737373;
+}
+
+.footer-bottom__item {
+    line-height: 1.3;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.footer-bottom__item:hover {
+    color: #000;
+
+}
+
+.footer-bottom__item:nth-child(2) {
+    text-decoration: none;
+
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+   ============================================ */
+@media (max-width: 900px) {
+    .footer-top {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .footer-nav {
+        gap: 40px;
+    }
+}
+
+@media (max-width: 600px) {
+    .site-footer {
+        padding: 40px 0 30px;
+    }
+
+    .footer-top {
+        margin-bottom: 40px;
+    }
+
+    .footer-nav {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}

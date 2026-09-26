@@ -1,0 +1,64 @@
+/* ============================================
+   CTA SECTION — Цени своё время
+   ============================================ */
+.cta-section {
+    padding: 0 0 100px;
+}
+
+/* Серая плашка */
+.cta-box {
+    background: #F5F5F5;
+    border-radius: 25px;
+    padding: 50px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Заголовок */
+.cta-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* Подзаголовок */
+.cta-subtitle {
+    font-size: 16px;
+    color: #737373;
+    margin: 0 0 8px;
+}
+
+/* Кнопка */
+.cta-btn {
+    /* Наследует стили .composite-btn из hero.css */
+    /* Тут можно оставить пустым, если хотите */
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+   ============================================ */
+@media (max-width: 768px) {
+    .cta-section {
+        padding: 0 0 60px;
+    }
+
+    .cta-box {
+        padding: 60px 24px;
+        border-radius: 20px;
+    }
+
+    .cta-title {
+        font-size: 32px;
+        letter-spacing: -0.5px;
+    }
+
+    .cta-subtitle {
+        font-size: 15px;
+    }
+}
