@@ -22,7 +22,10 @@
                     </a>
                     <span class="footer-logo__text">DenisDesign</span>
                 </div>
-
+                <div class="footer-conctact">
+                    <span class="owner-info__text">Самозанятый: ФИО</span>
+                    <span class="owner-info__text">ИНН: 000 000 000 000</span>
+                </div>
                 <div class="footer-socials">
                     <a href="mailto:denis.kiselev.design@gmail.com" class="footer-social" aria-label="Email">
                         <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -65,6 +68,7 @@
                     <a href="#https://t.me/denis_figma" class="footer-link">Поддержка</a>
                     <a href="#" class="footer-link">Пользовательское соглашение (оферта)</a>
                     <a href="#" class="footer-link">Политика конфиденциальности</a>
+                    <a href="#" class="footer-link">Лицензионное соглашение</a>
                 </div>
 
             </div>

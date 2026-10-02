@@ -2,7 +2,7 @@
 /**
  * Шаблон главной страницы
  */
-get_header(); // Подключает header.php
+get_header();
 ?>
 
 <main class="site-main">
@@ -10,38 +10,33 @@ get_header(); // Подключает header.php
     <!-- СЕКЦИЯ 1: HERO -->
     <section class="hero-section">
         <div class="container">
-            
-            <!-- Плашка -->
-            <div class="section-badge">
+
+            <div class="section-badge reveal reveal--fade">
                 <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-layer.svg" alt="Слои">
                 Берём структуру на себя
             </div>
 
-            <!-- Заголовок -->
-            <h1 class="hero-title">
+            <h1 class="hero-title reveal reveal--fade reveal--delay-1">
                 Прокачай дизайн<br>
                 Экономь <span class="highlight-wrap"><span class="highlight"><span class="highlight__word">время</span></span></span>
             </h1>
 
-            <!-- Подзаголовок -->
-            <p class="hero-subtitle">
+            <p class="hero-subtitle reveal reveal--fade reveal--delay-2">
                 Готовые UI-киты, иконки и компоненты в одном месте
             </p>
 
-            <!-- Кнопки -->
-            <div class="hero-buttons">
+            <div class="hero-buttons reveal reveal--fade reveal--delay-3">
                 <div class="composite-btn">
                     <a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="btn btn-dark btn-composite-main">В каталог</a><a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="btn btn-dark btn-composite-arrow" aria-label="Перейти в каталог"><img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-catalog-arrow.svg" alt=""></a>
                 </div>
                 <a href="#hero-video" class="btn btn-outline">Смотреть видео</a>
             </div>
 
-            <!-- Стрелка вниз -->
-            <div class="hero-scroll">
+            <div class="hero-scroll reveal reveal--fade reveal--delay-4">
                 <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-mouse.svg" alt="Мышь">
             </div>
 
-            <!-- Видео-превью -->
+            <!-- Видео-превью — здесь reveal НЕ ставим, работает scroll-zoom из main.js -->
             <div id="hero-video" class="hero-video">
                 <div class="video-placeholder">
                     <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -55,23 +50,22 @@ get_header(); // Подключает header.php
     </section>
 
     <!-- СЕКЦИЯ 2: ХИТЫ ПРОДАЖ -->
-    <section class="bestsellers-section">
+    <section id="bestsellers" class="bestsellers-section">
         <div class="container">
 
             <!-- Заголовок секции -->
             <div class="section-header">
-                <div class="section-badge">
+                <div class="section-badge reveal reveal--fade">
                     <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-document.svg" alt="">
                     Паки и пресеты для UX/UI
                 </div>
-                <h2 class="section-title">Хиты продаж</h2>
-                <p class="section-subtitle">Самые покупаемые сеты этого месяца</p>
+                <h2 class="section-title reveal reveal--fade reveal--delay-1">Хиты продаж</h2>
+                <p class="section-subtitle reveal reveal--fade reveal--delay-2">Самые покупаемые сеты этого месяца</p>
             </div>
 
             <!-- Слайдер -->
-            <div class="bestsellers-wrap">
+            <div class="bestsellers-wrap reveal reveal--fade reveal--delay-3">
 
-                <!-- Стрелки -->
                 <button class="slider-arrow slider-arrow--prev" aria-label="Назад" disabled>
                     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5.33341 0.666664L0.666748 5.33333L5.33341 10M0.666748 5.33333H10.0001" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
@@ -84,7 +78,6 @@ get_header(); // Подключает header.php
                     </svg>
                 </button>
 
-                <!-- Трек с карточками (только он обрезается) -->
                 <div class="bestsellers-slider" data-per-view="3" data-gap="30">
                     <div class="bestsellers-track">
                         <?php
@@ -122,13 +115,8 @@ get_header(); // Подключает header.php
                 </div>
 
                 <div class="slider-footer">
-                    <!-- Пустая распорка слева -->
                     <div class="slider-footer__spacer"></div>
-
-                    <!-- Пагинация по центру -->
                     <div class="slider-pagination"></div>
-
-                    <!-- Кнопка «В каталог» справа -->
                     <div class="bestsellers-cta-wrap">
                         <div class="composite-btn bestsellers-cta">
                             <a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="btn btn-dark btn-composite-main">В каталог</a><a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="btn btn-dark btn-composite-arrow" aria-label="Перейти в каталог"><img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-catalog-arrow.svg" alt=""></a>
@@ -145,20 +133,20 @@ get_header(); // Подключает header.php
 
             <!-- Заголовок секции -->
             <div class="section-header">
-                <div class="section-badge">
+                <div class="section-badge reveal reveal--fade">
                     <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-star.svg" alt="">
                     Здесь всё самое лучшее
                 </div>
-                <h2 class="section-title">
+                <h2 class="section-title reveal reveal--fade reveal--delay-1">
                     <span class="highlight-title">Почему</span> выбирают DD?
                 </h2>
-                <p class="section-subtitle">Создавайте проекты быстрее и зарабатывайте больше</p>
+                <p class="section-subtitle reveal reveal--fade reveal--delay-2">Создавайте проекты быстрее и зарабатывайте больше</p>
             </div>
 
             <!-- Сетка преимуществ -->
             <div class="why-us-grid">
 
-                <div class="why-us-card">
+                <div class="why-us-card reveal reveal--delay-1">
                     <div class="why-us-card__icon">
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-layers.svg" alt="">
                     </div>
@@ -166,7 +154,7 @@ get_header(); // Подключает header.php
                     <p class="why-us-card__text">Паки содержат полностью проработанные компоненты, их можно сразу вставить в проект</p>
                 </div>
 
-                <div class="why-us-card">
+                <div class="why-us-card reveal reveal--delay-2">
                     <div class="why-us-card__icon">
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-new.svg" alt="">
                     </div>
@@ -174,7 +162,7 @@ get_header(); // Подключает header.php
                     <p class="why-us-card__text">Регулярно добавляем свежие паки, чтобы вы всегда были в курсе современных решений</p>
                 </div>
 
-                <div class="why-us-card">
+                <div class="why-us-card reveal reveal--delay-3">
                     <div class="why-us-card__icon">
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-figma.svg" alt="">
                     </div>
@@ -182,7 +170,7 @@ get_header(); // Подключает header.php
                     <p class="why-us-card__text">Каждый элемент создан профессиональным дизайнером с вниманием к пикселям, сеткам и типографике</p>
                 </div>
 
-                <div class="why-us-card">
+                <div class="why-us-card reveal reveal--delay-4">
                     <div class="why-us-card__icon">
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-update.svg" alt="">
                     </div>
@@ -201,12 +189,12 @@ get_header(); // Подключает header.php
 
             <!-- Заголовок секции -->
             <div class="section-header">
-                <h2 class="section-title">Остались вопросы?</h2>
-                <p class="section-subtitle">Ответы на самые частые вопросы о покупке и использовании</p>
+                <h2 class="section-title reveal reveal--fade">Остались вопросы?</h2>
+                <p class="section-subtitle reveal reveal--fade reveal--delay-1">Ответы на самые частые вопросы о покупке и использовании</p>
             </div>
 
             <!-- Аккордеон -->
-            <div class="faq-list">
+            <div class="faq-list reveal reveal--fade reveal--delay-2">
 
                 <details class="faq-item" open>
                     <summary class="faq-item__question">
@@ -287,7 +275,7 @@ get_header(); // Подключает header.php
     <section class="cta-section">
         <div class="container">
 
-            <div class="cta-box">
+            <div class="cta-box reveal reveal--fade">
                 <h2 class="cta-title">Цени своё время</h2>
                 <p class="cta-subtitle">Не трать его на поиск по сети. Всё нужное здесь.</p>
 
@@ -301,4 +289,4 @@ get_header(); // Подключает header.php
 
 </main>
 
-<?php get_footer(); // Подключает footer.php ?>
+<?php get_footer(); ?>

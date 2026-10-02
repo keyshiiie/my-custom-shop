@@ -2,7 +2,7 @@
    BESTSELLERS SECTION
    ============================================ */
 .bestsellers-section {
-    padding: 80px 0 0;
+    padding: 75px 0;
 }
 
 /* ============================================
@@ -233,9 +233,12 @@
     background: #E5E5E5;
 }
 
+/* Скрываем стрелку, когда листать некуда */
 .slider-arrow:disabled {
-    cursor: not-allowed;
-    background: #F5F5F5;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .slider-arrow--prev {

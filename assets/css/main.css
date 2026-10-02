@@ -1,6 +1,4 @@
-/* ============================================
-   ПОДКЛЮЧЕНИЕ ШРИФТА
-   ============================================ */
+/* ПОДКЛЮЧЕНИЕ ШРИФТА */
 @font-face {
     font-family: 'Manrope';
     src: url('../fonts/manrope/Manrope-VariableFont_wght.woff2') format('woff2-variations'),
@@ -11,9 +9,7 @@
     font-display: swap;
 }
 
-/* ============================================
-   СБРОС И БАЗОВЫЕ НАСТРОЙКИ
-   ============================================ */
+/* СБРОС И БАЗОВЫЕ НАСТРОЙКИ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -44,19 +40,15 @@ img {
     display: block;
 }
 
-/* ============================================
-   КОНТЕЙНЕР
-   ============================================ */
+/* КОНТЕЙНЕР */
 .container {
     max-width: 1140px;
     margin: 0 auto;
     padding: 0 0; 
 }
 
-/* ============================================
-   БАЗОВЫЙ КЛАСС КНОПКИ
-   (без размеров и отступов — они будут в секциях)
-   ============================================ */
+/* БАЗОВЫЙ КЛАСС КНОПКИ
+   (без размеров и отступов — они будут в секциях) */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -66,33 +58,64 @@ img {
     font-weight: 500;
     font-size: 16px;
     line-height: 1;
-    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: all 0.3s ease;
     cursor: pointer;
     border: 1px solid transparent;
-    padding: 15px 20px;   /* базовый padding */
+    padding: 10px 20px;   /* базовый padding */
 }
 
+/* ТЁМНАЯ КНОПКА */
 .btn-dark {
-    background: #000;
+    background: #121419;
     color: #fff;
 }
 
 .btn-dark:hover {
-    background: #333;
+    background: #454545;
 }
 
+/* КНОПКА БЕЗ ФОНА */
 .btn-outline {
     background: transparent;
-    color: #000;
-    border-color: rgba(0, 0, 0, 0.15);
+    color: #121419;
+    border-color: #E5E5E5;
 }
 
 .btn-outline:hover {
-    border-color: rgba(0, 0, 0, 0.5);
+    background: #F5F5F5;
 }
 
+/* СОСТАВНАЯ КНОПКА "В КАТАЛОГ" */
+.composite-btn {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0;
+    font-size: 0;
+}
 
-/* Заголовок секции */
+.composite-btn .btn {
+    padding: 10px 20px;
+}
+
+.composite-btn .btn-dark:hover {
+    background: #121419;  
+}
+
+.composite-btn:hover .btn-dark {
+    background: #454545;
+}
+
+.composite-btn .btn-composite-arrow {
+    padding: 10px;
+}
+
+.composite-btn .btn-composite-arrow img {
+    display: block;
+    width: 16px;
+    height: 16px;
+}
+
+/* ЗАГОЛОВОК СЕКЦИИ + ПЛАШКА */
 .section-header {
     text-align: center;
     margin-bottom: 40px;
@@ -127,4 +150,51 @@ img {
 /* Скрываем нативную ссылку WooCommerce "Просмотр корзины" */
 .product-card .added_to_cart {
     display: none !important;
+}
+
+/* SCROLL REVEAL — появление блоков при скролле*/
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+        opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Варианты появления */
+.reveal--fade {
+    transform: none;              /* без сдвига — просто появление */
+}
+
+.reveal--left {
+    transform: translateX(-40px);
+}
+
+.reveal--right {
+    transform: translateX(40px);
+}
+
+.reveal--scale {
+    transform: scale(0.95);
+}
+
+/* Задержки — для последовательного появления группы элементов */
+.reveal--delay-1 { transition-delay: 0.1s; }
+.reveal--delay-2 { transition-delay: 0.2s; }
+.reveal--delay-3 { transition-delay: 0.3s; }
+.reveal--delay-4 { transition-delay: 0.4s; }
+
+/* Если у пользователя отключены анимации — отключаем */
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
 }

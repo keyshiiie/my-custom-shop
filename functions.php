@@ -1,4 +1,8 @@
 <?php
+require_once get_template_directory() . '/vendor/autoload.php';
+
+use Kucrut\Vite;
+
 function my_theme_enqueue_styles() {
     $theme_uri = get_template_directory_uri();
     $version   = '1.0';
@@ -48,7 +52,7 @@ add_action( 'after_setup_theme', 'my_theme_setup' );
 function my_theme_fix_anchor_menu_links( $atts, $item, $args ) {
     if ( isset( $args->theme_location ) && $args->theme_location === 'primary' ) {
         $url = $atts['href'] ?? '';
-        
+
         // Если URL начинается с # — это якорь
         if ( strpos( $url, '#' ) === 0 && ! is_front_page() ) {
             $atts['href'] = home_url( '/' ) . $url;
@@ -58,6 +62,9 @@ function my_theme_fix_anchor_menu_links( $atts, $item, $args ) {
 }
 add_filter( 'nav_menu_link_attributes', 'my_theme_fix_anchor_menu_links', 10, 3 );
 
+/**
+ * Стили секций (bestsellers, why-us, faq, cta, footer).
+ */
 function my_theme_enqueue_scripts() {
     $theme_uri = get_template_directory_uri();
     $version   = '1.1';
@@ -70,7 +77,7 @@ function my_theme_enqueue_scripts() {
         $version
     );
 
-     // Стили секции why-us
+    // Стили секции why-us
     wp_enqueue_style(
         'why-us-style',
         $theme_uri . '/assets/css/why-us.css',
@@ -102,21 +109,37 @@ function my_theme_enqueue_scripts() {
         $version
     );
 
-    // Свой слайдер
-    wp_enqueue_script(
-        'my-theme-scripts',
-        $theme_uri . '/assets/js/main.js',
-        array(),
-        $version,
-        true
-    );
+    // ⚠️ wp_enqueue_script для main.js УДАЛЁН.
+    // Скрипты теперь подключает Vite через Vite\enqueue_asset() (см. ниже).
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_scripts' );
 
 /**
- * Передаём ID товаров из корзины в JS
+ * Подключение скриптов, собранных Vite.
+ *
+ * В dev-режиме (npm run dev) Vite-плагин отдаёт скрипты с localhost:5173,
+ * работает HMR. В prod (npm run build) — подключается собранный бандл
+ * из /assets/js/dist/ по manifest.json.
  */
-function my_theme_cart_data_to_js() {
+function my_theme_enqueue_vite() {
+    Vite\enqueue_asset(
+        get_template_directory() . '/assets/js/dist',
+        'assets/js/main.js',
+        [
+            'handle'    => 'theme-main',
+            'in-footer' => true,
+        ]
+    );
+}
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_vite' );
+
+/**
+ * Передаём ID товаров из корзины в JS.
+ *
+ * Привязано к хендлу Vite-скрипта 'theme-main', чтобы window.wc_cart_data
+ * гарантированно появился ДО выполнения cart-button.js.
+ */
+function my_theme_localize_cart_data() {
     if ( ! function_exists( 'WC' ) || is_admin() ) return;
 
     $cart_items = array();
@@ -125,12 +148,11 @@ function my_theme_cart_data_to_js() {
             $cart_items[] = $cart_item['product_id'];
         }
     }
-    ?>
-    <script>
-        window.wc_cart_data = {
-            items: <?php echo wp_json_encode( $cart_items ); ?>
-        };
-    </script>
-    <?php
+
+    wp_localize_script(
+        'theme-main',
+        'wc_cart_data',
+        array( 'items' => $cart_items )
+    );
 }
-add_action( 'wp_footer', 'my_theme_cart_data_to_js', 5 );
+add_action( 'wp_enqueue_scripts', 'my_theme_localize_cart_data', 20 );
