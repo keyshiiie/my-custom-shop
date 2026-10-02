@@ -54,6 +54,8 @@
     margin-bottom: 16px;
     align-items: center;
     flex-wrap: nowrap;
+    z-index: 30;
+    position: relative;
 }
 
 /* 3.1 Поиск */
@@ -108,6 +110,7 @@
 .catalog-filter {
     position: relative;
     flex: 0 0 auto;
+    z-index: 1;
 }
 
 /* Кнопка-триггер */
@@ -173,7 +176,7 @@
     list-style: none;
     margin: 0;
     padding: 6px;
-    z-index: 20;
+    z-index: 30;
 
     opacity: 0;
     visibility: hidden;
@@ -828,4 +831,78 @@
     background: #121419;
     border-color: #121419;
     color: #fff;
+}
+
+/* ============================================
+   Пагинация каталога
+   ============================================ */
+
+.catalog-page .woocommerce-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    gap: 4px;
+}
+
+.catalog-page .woocommerce-pagination .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #121419;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+}
+
+.catalog-page .woocommerce-pagination a.page-numbers:hover {
+    background: #F5F5F5;
+}
+
+.catalog-page .woocommerce-pagination .page-numbers.current {
+    background: #F5F5F5;
+}
+
+.catalog-page .woocommerce-pagination .page-numbers.dots {
+    background: transparent;
+    cursor: default;
+    min-width: 24px;
+    padding: 0;
+    color: #737373;
+}
+
+.catalog-page .woocommerce-pagination a.page-numbers.prev,
+.catalog-page .woocommerce-pagination a.page-numbers.next {
+    background: #F5F5F5;
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    margin: 0 16px;
+}
+
+.catalog-page .woocommerce-pagination a.page-numbers.prev {
+    margin-right: 16px;
+}
+
+.catalog-page .woocommerce-pagination a.page-numbers.next {
+    margin-left: 16px;
+}
+
+.catalog-page .woocommerce-pagination a.page-numbers.prev:hover,
+.catalog-page .woocommerce-pagination a.page-numbers.next:hover {
+    background: #E5E5E5;
+    
+}
+
+/* SVG-стрелки внутри prev/next */
+.catalog-page .woocommerce-pagination a.page-numbers.prev svg,
+.catalog-page .woocommerce-pagination a.page-numbers.next svg {
+    display: block;
+    width: 8px;
+    height: 14px;
 }

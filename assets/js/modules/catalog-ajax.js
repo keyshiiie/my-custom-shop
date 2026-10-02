@@ -1,5 +1,5 @@
 // ============================================
-// AJAX-фильтрация каталога
+// AJAX-фильтрация каталога + AJAX-пагинация
 // ============================================
 (function () {
     'use strict';
@@ -53,7 +53,7 @@
 
             return {
                 categories: categories.join(','),
-                tags: tags.join(','),
+                tags:       tags.join(','),
                 price_min,
                 price_max,
                 free_only,
@@ -97,7 +97,6 @@
                     const data = response.data;
 
                     renderResults(data);
-
                     updateUrl(filters);
 
                     if (chipsCount) {
@@ -130,34 +129,32 @@
             } else {
                 html = '<ul class="products">' + data.html + '</ul>';
 
+                // ⚠️ PHP уже оборачивает пагинацию в <nav class="woocommerce-pagination">,
+                // поэтому здесь просто вставляем как есть — без лишней обёртки.
                 if (data.pagination) {
-                    html += '<nav class="woocommerce-pagination">' + data.pagination + '</nav>';
+                    html += data.pagination;
                 }
             }
 
             resultsEl.innerHTML = html;
-
-            bindPagination();
         }
 
         // --------------------------------------------
-        // Пагинация
+        // Делегирование клика по пагинации
+        // Работает для любой пагинации — и из PHP, и после AJAX
         // --------------------------------------------
-        function bindPagination() {
-            const nav = resultsEl.querySelector('.woocommerce-pagination');
-            if (!nav) return;
+        function handlePaginationClick(e) {
+            const link = e.target.closest('.woocommerce-pagination a');
+            if (!link) return;
+            if (!resultsEl.contains(link)) return;
 
-            nav.querySelectorAll('a').forEach(function (link) {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
+            e.preventDefault();
 
-                    const href  = link.getAttribute('href');
-                    const match = href.match(/#page\/(\d+)/);
-                    const page  = match ? parseInt(match[1], 10) : 1;
+            const href  = link.getAttribute('href');
+            const match = href.match(/#page\/(\d+)/);
+            const page  = match ? parseInt(match[1], 10) : 1;
 
-                    applyFilters(page);
-                });
-            });
+            applyFilters(page);
         }
 
         // --------------------------------------------
@@ -196,7 +193,9 @@
             applyFilters(1);
         });
 
+        // --------------------------------------------
         // Поиск — debounce
+        // --------------------------------------------
         const searchInput = document.querySelector('.catalog-search__input');
         if (searchInput) {
             let searchTimer;
@@ -216,14 +215,26 @@
             }
         }
 
+        // --------------------------------------------
         // Назад/вперёд в браузере
+        // --------------------------------------------
         window.addEventListener('popstate', function (e) {
             if (e.state && e.state.filters) {
                 applyFilters(1);
             }
         });
+
+        // --------------------------------------------
+        // 👇 ЕДИНОЖДЫ навешиваем делегированный обработчик
+        // на клики по пагинации (и для PHP-пагинации, и для AJAX-пагинации).
+        // Работает без переинициализации после каждого AJAX-запроса.
+        // --------------------------------------------
+        resultsEl.addEventListener('click', handlePaginationClick);
     }
 
+    // --------------------------------------------
+    // Запуск
+    // --------------------------------------------
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

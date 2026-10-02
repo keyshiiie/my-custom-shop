@@ -1,5 +1,5 @@
 // ============================================
-// Кнопка "В корзину" → "К корзине"
+// Кнопка "В корзину" → "В корзине"
 // + защита от повторного добавления
 // ============================================
 (function () {
@@ -14,7 +14,7 @@
     // Меняет состояние кнопки
     function setCartBtnState(btn, inCart) {
         if (inCart) {
-            btn.textContent = 'К корзине';
+            btn.textContent = 'В корзине';
             btn.href = btn.dataset.cart_url;
             btn.classList.remove('ajax_add_to_cart');
             btn.classList.add('is-in-cart');

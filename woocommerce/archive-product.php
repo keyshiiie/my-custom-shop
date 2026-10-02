@@ -66,7 +66,7 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
 <div class="catalog-page">
     <div class="container">
         <!-- 1. Хлебные крошки -->
-        <nav class="catalog-breadcrumbs">
+        <nav class="catalog-breadcrumbs reveal reveal--fade">
             <?php woocommerce_breadcrumb( array(
                 'delimiter'   => '<span class="catalog-breadcrumbs__sep">›</span>',
                 'wrap_before' => '',
@@ -77,10 +77,10 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
         </nav>
 
         <!-- 2. Заголовок -->
-        <h1 class="catalog-title"><?php woocommerce_page_title(); ?></h1>
+        <h1 class="catalog-title reveal reveal--fade"><?php woocommerce_page_title(); ?></h1>
 
         <!-- 3. Панель поиска и фильтров -->
-        <div class="catalog-toolbar">
+        <div class="catalog-toolbar reveal reveal--fade">
 
             <!-- 3.1 Поиск -->
             <form role="search" method="get" class="catalog-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
@@ -251,7 +251,7 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
         </div>
 
         <!-- 4. Чипсы активных фильтров + Найдено -->
-        <div class="catalog-chips">
+        <div class="catalog-chips reveal reveal--fade">
             <span class="catalog-chips__count">
                 Найдено: <?php echo esc_html( $GLOBALS['wp_query']->found_posts ); ?>
             </span>
@@ -271,7 +271,7 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
         </div>
 
         <!-- 5. Сетка товаров -->
-        <div class="catalog-results" data-catalog-results>
+        <div class="catalog-results reveal reveal--fade" data-catalog-results>
 
             <?php if ( woocommerce_product_loop() ) : ?>
 

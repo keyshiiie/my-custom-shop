@@ -69,57 +69,19 @@ function my_theme_enqueue_scripts() {
     $theme_uri = get_template_directory_uri();
     $version   = '1.1';
 
-    // Стили секции bestsellers
-    wp_enqueue_style(
-        'bestsellers-style',
-        $theme_uri . '/assets/css/bestsellers.css',
-        array( 'base-style' ),
-        $version
-    );
+    wp_enqueue_style( 'bestsellers-style', $theme_uri . '/assets/css/bestsellers.css', array( 'base-style' ), $version );
+    wp_enqueue_style( 'why-us-style',      $theme_uri . '/assets/css/why-us.css',      array( 'base-style' ), $version );
+    wp_enqueue_style( 'faq-style',         $theme_uri . '/assets/css/faq.css',         array( 'base-style' ), $version );
+    wp_enqueue_style( 'cta-style',         $theme_uri . '/assets/css/cta.css',         array( 'base-style' ), $version );
+    wp_enqueue_style( 'product-card-style', $theme_uri . '/assets/css/product-card.css', array( 'base-style' ), $version );
+    wp_enqueue_style( 'footer-style',      $theme_uri . '/assets/css/footer.css',      array( 'base-style' ), $version );
 
-    // Стили секции why-us
-    wp_enqueue_style(
-        'why-us-style',
-        $theme_uri . '/assets/css/why-us.css',
-        array( 'base-style' ),
-        $version
-    );
-
-    // Стили секции FAQ
-    wp_enqueue_style(
-        'faq-style',
-        $theme_uri . '/assets/css/faq.css',
-        array( 'base-style' ),
-        $version
-    );
-
-    // Стили секции CTA
-    wp_enqueue_style(
-        'cta-style',
-        $theme_uri . '/assets/css/cta.css',
-        array( 'base-style' ),
-        $version
-    );
-
-    // Стили футера
-    wp_enqueue_style(
-        'footer-style',
-        $theme_uri . '/assets/css/footer.css',
-        array( 'base-style' ),
-        $version
-    );
-
-    // ⚠️ wp_enqueue_script для main.js УДАЛЁН.
-    // Скрипты теперь подключает Vite через Vite\enqueue_asset() (см. ниже).
+    // ⚠️ wp_enqueue_script для main.js УДАЛЁН — им управляет Vite.
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_scripts' );
 
 /**
  * Подключение скриптов, собранных Vite.
- *
- * В dev-режиме (npm run dev) Vite-плагин отдаёт скрипты с localhost:5173,
- * работает HMR. В prod (npm run build) — подключается собранный бандл
- * из /assets/js/dist/ по manifest.json.
  */
 function my_theme_enqueue_vite() {
     Vite\enqueue_asset(
@@ -135,9 +97,6 @@ add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_vite' );
 
 /**
  * Передаём ID товаров из корзины в JS.
- *
- * Привязано к хендлу Vite-скрипта 'theme-main', чтобы window.wc_cart_data
- * гарантированно появился ДО выполнения cart-button.js.
  */
 function my_theme_localize_cart_data() {
     if ( ! function_exists( 'WC' ) || is_admin() ) return;
@@ -158,23 +117,13 @@ function my_theme_localize_cart_data() {
 add_action( 'wp_enqueue_scripts', 'my_theme_localize_cart_data', 20 );
 
 /**
- * Отключаем стандартные элементы каталога WooCommerce,
- * потому что мы сверстали их вручную в archive-product.php.
+ * Отключаем стандартные элементы каталога WooCommerce.
  */
 function my_theme_disable_wc_catalog_defaults() {
-    // Заголовок архива
     remove_action( 'woocommerce_shop_loop_header', 'woocommerce_product_taxonomy_archive_header', 10 );
-
-    // «Показано 1–12 из 12»
     remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
-
-    // Сортировка WC
     remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
-
-    // Сайдбар — у нас его нет
     remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
-
-    // Стандартная обёртка WC
     remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
     remove_action( 'woocommerce_after_main_content',  'woocommerce_output_content_wrapper_end', 10 );
 }
@@ -197,11 +146,34 @@ function my_theme_enqueue_catalog_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_catalog_styles', 15 );
 
+/* ============================================================
+   ЧИСЛО ТОВАРОВ НА СТРАНИЦЕ КАТАЛОГА
+   Меняется в одном месте. Работает и для основного запроса,
+   и для AJAX-фильтрации.
+   ============================================================ */
+function my_theme_products_per_page() {
+    return 9;
+}
 /**
- * AJAX-фильтрация каталога.
+ * Основной запрос (обычная загрузка /shop/) — тоже режем по 2.
  */
+function my_theme_set_products_per_page( $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) return;
+
+    if (
+        $query->is_post_type_archive( 'product' ) ||
+        $query->is_tax( 'product_cat' ) ||
+        $query->is_tax( 'product_tag' )
+    ) {
+        $query->set( 'posts_per_page', my_theme_products_per_page() );
+    }
+}
+add_action( 'pre_get_posts', 'my_theme_set_products_per_page' );
+
+/* ============================================================
+   AJAX-ФИЛЬТРАЦИЯ КАТАЛОГА
+   ============================================================ */
 function my_theme_ajax_filter_catalog() {
-    // --- Собираем параметры ---
     $paged       = max( 1, (int) ( $_GET['paged'] ?? 1 ) );
     $categories  = array_filter( array_map( 'sanitize_title', explode( ',', $_GET['categories'] ?? '' ) ) );
     $tags        = array_filter( array_map( 'sanitize_title', explode( ',', $_GET['tags'] ?? '' ) ) );
@@ -211,11 +183,10 @@ function my_theme_ajax_filter_catalog() {
     $sort        = sanitize_key( $_GET['sort'] ?? '' );
     $search      = sanitize_text_field( $_GET['search'] ?? '' );
 
-    // --- Базовый запрос ---
     $args = array(
         'post_type'      => 'product',
         'post_status'    => 'publish',
-        'posts_per_page' => 9,
+        'posts_per_page' => my_theme_products_per_page(),   // ← единое число
         'paged'          => $paged,
     );
 
@@ -245,7 +216,6 @@ function my_theme_ajax_filter_catalog() {
     // --- meta_query (цена) ---
     $meta_query = array( 'relation' => 'AND' );
 
-    // «Только бесплатные» — товары с ценой 0
     if ( $free_only ) {
         $meta_query[] = array(
             'key'     => '_price',
@@ -302,17 +272,14 @@ function my_theme_ajax_filter_catalog() {
             $args['order']   = 'ASC';
     }
 
-    // --- Поиск ---
     if ( $search ) {
         $args['s'] = $search;
     }
 
-    // --- Выполняем запрос ---
     $query = new WP_Query( $args );
 
     // --- Рендерим карточки ---
     ob_start();
-
     if ( $query->have_posts() ) {
         while ( $query->have_posts() ) {
             $query->the_post();
@@ -320,25 +287,25 @@ function my_theme_ajax_filter_catalog() {
         }
     }
     wp_reset_postdata();
-
     $html = ob_get_clean();
 
-    // --- Пагинация ---
+    // --- Пагинация (та же разметка, что и в woocommerce/pagination.php) ---
     $pagination_html = '';
 
     if ( $query->max_num_pages > 1 ) {
-        $pagination_html = paginate_links( array(
+        $pagination_html  = '<nav class="woocommerce-pagination">';
+        $pagination_html .= paginate_links( array(
             'base'      => '#page/%#%',
             'format'    => '',
             'current'   => $paged,
             'total'     => $query->max_num_pages,
             'type'      => 'plain',
-            'prev_text' => '‹',
-            'next_text' => '›',
+            'prev_text' => '<svg width="4" height="8" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.33301 1.33337L1.33301 7.33337L7.33301 13.3334" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'next_text' => '<svg width="4" height="8" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.666992 1.33337L6.66699 7.33337L0.666992 13.3334" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         ) );
+        $pagination_html .= '</nav>';
     }
 
-    // --- Ответ ---
     wp_send_json_success( array(
         'html'        => $html,
         'pagination'  => $pagination_html,
@@ -347,10 +314,12 @@ function my_theme_ajax_filter_catalog() {
         'current'     => $paged,
     ) );
 }
-
 add_action( 'wp_ajax_filter_catalog',        'my_theme_ajax_filter_catalog' );
 add_action( 'wp_ajax_nopriv_filter_catalog', 'my_theme_ajax_filter_catalog' );
 
+/**
+ * Передаём URL admin-ajax.php в JS.
+ */
 function my_theme_localize_ajax_url() {
     wp_localize_script(
         'theme-main',

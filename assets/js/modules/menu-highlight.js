@@ -1,22 +1,53 @@
 // ============================================
 // Подсветка активного пункта меню
-// Работает только на главной странице
+//
+// На главной: следим за скроллом, подсвечиваем якоря.
+// В каталоге: подсвечиваем пункт "Каталог".
 // ============================================
 (function () {
     'use strict';
 
     function init() {
-        // Только на главной
-        if (!document.body.classList.contains('home')) return;
-
         const menu = document.querySelector('.nav-menu');
         if (!menu) return;
 
-        const allLinks  = menu.querySelectorAll('a');
+        const allLinks = menu.querySelectorAll('a');
+        if (!allLinks.length) return;
+
+        // --------------------------------------------
+        // РЕЖИМ 1: КАТАЛОГ — подсветить пункт "Каталог"
+        // --------------------------------------------
+        if (document.body.classList.contains('post-type-archive-product')
+            || document.body.classList.contains('tax-product_cat')
+            || document.body.classList.contains('tax-product_tag')
+            || document.body.classList.contains('single-product')
+            || document.body.classList.contains('woocommerce-shop')
+        ) {
+            allLinks.forEach(function (link) {
+                const href = link.getAttribute('href');
+                if (!href) return;
+
+                // Ищем пункт, ведущий на /shop/ или /catalog/ (страница WC)
+                const url = new URL(link.href, window.location.origin);
+                const path = url.pathname.replace(/\/$/, ''); // убираем хвостовой /
+
+                if (path === '/shop' || path === '/catalog' || path.endsWith('/shop') || path.endsWith('/catalog')) {
+                    link.classList.add('is-active');
+                }
+            });
+
+            return; // в каталоге якоря не трогаем
+        }
+
+        // --------------------------------------------
+        // РЕЖИМ 2: ГЛАВНАЯ — якоря + скролл
+        // --------------------------------------------
+        if (!document.body.classList.contains('home')) return;
+
         const hashLinks = menu.querySelectorAll('a[href*="#"]');
         if (!hashLinks.length) return;
 
-        // Ищем ссылку "Главная" — ведёт на корень без якоря
+        // Ищем ссылку "Главная"
         let homeLink = null;
         allLinks.forEach(function (link) {
             const href = link.getAttribute('href');
@@ -43,8 +74,6 @@
 
         if (!pairs.length) return;
 
-        // Сортируем по вертикали — на случай, если порядок в меню
-        // не совпадает с порядком секций
         pairs.sort(function (a, b) {
             return a.section.offsetTop - b.section.offsetTop;
         });
@@ -61,12 +90,10 @@
                 }
             });
 
-            // Подсветка якорей
             pairs.forEach(function (pair, i) {
                 pair.link.classList.toggle('is-active', i === activeIndex);
             });
 
-            // Подсветка "Главная", если ни один якорь не активен
             if (homeLink) {
                 homeLink.classList.toggle('is-active', activeIndex === -1);
             }
@@ -78,7 +105,6 @@
             link.addEventListener('click', function (e) {
                 const url = new URL(link.href, window.location.origin);
 
-                // Только если ссылка ведёт на текущую страницу
                 if (url.pathname !== window.location.pathname) return;
 
                 const target = document.querySelector(url.hash);

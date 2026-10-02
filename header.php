@@ -33,12 +33,6 @@
 
         <!-- 3. ИКОНКИ И КОРЗИНА -->
         <div class="header-actions">
-            
-            <!-- Поиск -->
-            <a href="#" class="header-icon search-toggle">
-                <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-search.svg" alt="Поиск">
-            </a>
-
             <!-- Корзина с счетчиком -->
             <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="header-icon cart-icon">
                 <img src="<?php echo get_template_directory_uri(); ?>/assets/img/icon-cart.svg" alt="Корзина">
