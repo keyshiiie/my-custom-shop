@@ -66,14 +66,12 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
 <div class="catalog-page">
     <div class="container">
         <!-- 1. Хлебные крошки -->
-        <nav class="catalog-breadcrumbs reveal reveal--fade">
-            <?php woocommerce_breadcrumb( array(
-                'delimiter'   => '<span class="catalog-breadcrumbs__sep">›</span>',
-                'wrap_before' => '',
-                'wrap_after'  => '',
-                'before'      => '<span class="catalog-breadcrumbs__item">',
-                'after'       => '</span>',
-            ) ); ?>
+        <nav class="breadcrumbs reveal reveal--fade">
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="breadcrumbs__item">Главная</a>
+            <span class="breadcrumbs__sep">›</span>
+            <span class="breadcrumbs__item breadcrumbs__item--current">
+                <?php woocommerce_page_title(); ?>
+            </span>
         </nav>
 
         <!-- 2. Заголовок -->

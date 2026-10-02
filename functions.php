@@ -330,3 +330,55 @@ function my_theme_localize_ajax_url() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_localize_ajax_url', 20 );
+
+/**
+ * Убираем всё лишнее с карточки товара — мы сверстали свою разметку.
+ */
+function my_theme_disable_wc_single_defaults() {
+    // Убираем стандартные блоки, которые выводятся хуками в content-single-product
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40 );
+    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_sharing', 50 );
+
+    // Убираем вкладки (у нас своё описание и состав)
+    remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+
+    // Убираем upsells — они нам не нужны
+    remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
+
+    // Related оставляем — это «Вам может понравиться»
+    // remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+}
+add_action( 'init', 'my_theme_disable_wc_single_defaults' );
+
+// стили для детальной информации
+function my_theme_enqueue_product_single_styles() {
+    if ( ! is_product() ) return;
+
+    wp_enqueue_style(
+        'product-single-style',
+        get_template_directory_uri() . '/assets/css/product-single.css',
+        array( 'base-style' ),
+        '1.0'
+    );
+}
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_product_single_styles', 15 );
+
+/**
+ * Related products — «Вам может понравиться».
+ */
+function my_theme_related_products_heading( $heading ) {
+    return 'Вам может понравиться';
+}
+add_filter( 'woocommerce_product_related_products_heading', 'my_theme_related_products_heading' );
+
+function my_theme_related_products_count( $args ) {
+    $args['posts_per_page'] = 3;
+    $args['columns']        = 3;
+    return $args;
+}
+add_filter( 'woocommerce_output_related_products_args', 'my_theme_related_products_count' );
