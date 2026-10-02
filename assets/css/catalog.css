@@ -811,3 +811,21 @@
     color: #737373;
     grid-column: 1 / -1;
 }
+
+/* Заблокированные поля цены */
+.catalog-price__input:disabled {
+    background: #F5F5F5;
+    color: #B5B5B5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.catalog-price__input:disabled::placeholder {
+    color: #B5B5B5;
+}
+
+.catalog-price__free-input:checked + .catalog-price__free-box {
+    background: #121419;
+    border-color: #121419;
+    color: #fff;
+}

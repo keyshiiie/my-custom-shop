@@ -34,6 +34,41 @@
             const placeholder = filter.dataset.placeholder || label.textContent.trim();
 
             // --------------------------------------------
+            // Панель цены: чекбокс «Только бесплатные» ↔ поля «От/До»
+            // --------------------------------------------
+            const priceFreeInput = filter.querySelector('.catalog-price__free-input');
+            const priceInputs    = filter.querySelectorAll('.catalog-price__input');
+
+            if (priceFreeInput && priceInputs.length) {
+                // Клик по чекбоксу «Только бесплатные»
+                priceFreeInput.addEventListener('change', function () {
+                    if (priceFreeInput.checked) {
+                        // Очищаем поля и блокируем
+                        priceInputs.forEach(function (input) {
+                            input.value = '';
+                            input.disabled = true;
+                        });
+                    } else {
+                        // Разблокируем
+                        priceInputs.forEach(function (input) {
+                            input.disabled = false;
+                        });
+                    }
+                });
+
+                // Ввод в полях «От/До» — снимает чекбокс
+                priceInputs.forEach(function (input) {
+                    input.addEventListener('input', function () {
+                        if (input.value !== '' && priceFreeInput.checked) {
+                            priceFreeInput.checked = false;
+                            priceInputs.forEach(function (i) {
+                                i.disabled = false;
+                            });
+                        }
+                    });
+                });
+            }
+            // --------------------------------------------
             // Открытие / закрытие дропдауна
             // --------------------------------------------
             toggle.addEventListener('click', function (e) {
