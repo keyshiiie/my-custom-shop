@@ -156,3 +156,43 @@ function my_theme_localize_cart_data() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_localize_cart_data', 20 );
+
+/**
+ * Отключаем стандартные элементы каталога WooCommerce,
+ * потому что мы сверстали их вручную в archive-product.php.
+ */
+function my_theme_disable_wc_catalog_defaults() {
+    // Заголовок архива
+    remove_action( 'woocommerce_shop_loop_header', 'woocommerce_product_taxonomy_archive_header', 10 );
+
+    // «Показано 1–12 из 12»
+    remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+
+    // Сортировка WC
+    remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+
+    // Сайдбар — у нас его нет
+    remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
+
+    // Стандартная обёртка WC
+    remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
+    remove_action( 'woocommerce_after_main_content',  'woocommerce_output_content_wrapper_end', 10 );
+}
+add_action( 'init', 'my_theme_disable_wc_catalog_defaults' );
+
+/**
+ * Стили страницы каталога.
+ */
+function my_theme_enqueue_catalog_styles() {
+    if ( ! is_shop() && ! is_product_category() && ! is_product_tag() ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'catalog-style',
+        get_template_directory_uri() . '/assets/css/catalog.css',
+        array( 'base-style' ),
+        '1.0'
+    );
+}
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_catalog_styles', 15 );

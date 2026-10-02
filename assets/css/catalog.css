@@ -1,0 +1,797 @@
+/* ============================================
+   СТРАНИЦА КАТАЛОГА
+   ============================================ */
+
+.catalog-page {
+    padding: 50px 0;
+}
+
+/* 1. Хлебные крошки */
+.catalog-breadcrumbs {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 8px;
+    font-size: 14px;
+    color: #737373;
+    margin-bottom: 32px;
+}
+
+.catalog-breadcrumbs a {
+    color: #737373;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.catalog-breadcrumbs a:hover {
+    color: #121419;
+}
+
+.catalog-breadcrumbs__sep {
+    color: #737373;
+    font-size: 16px;
+}
+
+.catalog-breadcrumbs__item:last-child {
+    color: #000;
+    font-weight: 500;
+}
+
+/* 2. Заголовок */
+.catalog-title {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: #000;
+    margin-bottom: 24px;
+}
+
+/* 3. Панель инструментов */
+.catalog-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+/* 3.1 Поиск */
+.catalog-search {
+    flex: 1 1 auto;
+    min-width: 350px;
+    max-width: 570px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;     /* ← вертикальные паддинги не нужны, высота фиксирована */
+    height: 47px;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+.catalog-search:focus-within {
+    border-color: #737373;
+}
+
+.catalog-search__icon {
+    color: #737373;
+    flex-shrink: 0;
+}
+
+.catalog-search__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    font-family: inherit;
+    color: #737373;
+}
+
+.catalog-search__input::placeholder {
+    color: #737373;
+}
+
+
+/* 3.2 Фильтры */
+.catalog-filters {
+    display: flex;
+    gap: 16px;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.catalog-filter {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+/* Кнопка-триггер */
+.catalog-filter__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    height: 47px;
+    min-width: 140px;
+    padding: 0 16px;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #121419;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.catalog-filter__toggle:hover,
+.catalog-filter__toggle:focus {
+    border-color: #121419;
+    outline: none;
+}
+
+.catalog-filter__label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Стрелка */
+.catalog-filter__arrow {
+    flex-shrink: 0;
+    color: #737373;
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+/* Поворот стрелки при открытии */
+.catalog-filter.is-open .catalog-filter__arrow {
+    transform: rotate(180deg);
+    color: #121419;
+}
+
+/* Выпадающий список */
+.catalog-filter__list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    z-index: 20;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.catalog-filter.is-open .catalog-filter__list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Опция */
+.catalog-filter__option {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #121419;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+}
+
+.catalog-filter__option:hover {
+    background: #F5F5F5;
+}
+
+.catalog-filter__option.is-selected {
+    font-weight: 500;
+    color: #000;
+    background: #F5F5F5;
+}
+
+/* 4. Чипсы активных фильтров */
+.catalog-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 23px;
+    font-size: 14px;
+}
+
+.catalog-chips__count {
+    color: #737373;
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.catalog-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #E5E5E5;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #121419;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.catalog-chip:hover {
+    background: #E5E5E5;
+}
+
+.catalog-chips__reset {
+    color: #62A4F6;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 8px;
+    transition: opacity 0.2s ease;
+}
+
+.catalog-chips__reset:hover {
+    opacity: 0.2;
+}
+
+/* 5. Сетка товаров */
+.catalog-page .products {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+.catalog-page .products::before,
+.catalog-page .products::after {
+    content: none !important;
+    display: none !important;
+}
+
+.catalog-page .products li.product {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clear: none !important;
+}
+
+/* 6. Пагинация */
+.catalog-page .woocommerce-pagination {
+    margin-top: 48px;
+    display: flex;
+    justify-content: center;
+}
+
+.catalog-page .woocommerce-pagination ul {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.catalog-page .woocommerce-pagination ul li {
+    margin: 0;
+}
+
+.catalog-page .woocommerce-pagination ul li a,
+.catalog-page .woocommerce-pagination ul li span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #000;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.catalog-page .woocommerce-pagination ul li a:hover {
+    background: #F5F5F5;
+}
+
+.catalog-page .woocommerce-pagination ul li span.current {
+    background: #121419;
+    color: #fff;
+    font-weight: 500;
+}
+
+.catalog-page .woocommerce-pagination ul li a.next,
+.catalog-page .woocommerce-pagination ul li a.prev {
+    background: #F5F5F5;
+}
+
+/* ============================================
+   Мультивыбор с чекбоксами
+   ============================================ */
+
+.catalog-filter__option--checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+}
+
+/* Кастомный чекбокс */
+.catalog-filter__checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #B5B5B5;
+    border-radius: 4px;
+    background: #fff;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    color: transparent;      /* галочка невидима по умолчанию */
+}
+
+.catalog-filter__check {
+    display: block;
+    width: 12px;
+    height: 10px;
+}
+
+/* Состояние выбранного */
+.catalog-filter__option--checkbox.is-selected .catalog-filter__checkbox {
+    background: #121419;
+    border-color: #121419;
+    color: #fff;             /* галочка становится белой */
+}
+
+/* Ховер — только на невыбранных */
+.catalog-filter__option--checkbox:not(.is-selected):hover .catalog-filter__checkbox {
+    border-color: #121419;
+}
+
+/* Текст опции */
+.catalog-filter__option-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Ховер на всю опцию */
+.catalog-filter__option--checkbox:hover {
+    background: #F5F5F5;
+}
+
+/* Выбранная опция — не подсвечиваем фоном, только чекбокс */
+.catalog-filter__option--checkbox.is-selected {
+    background: transparent;
+    font-weight: 500;
+}
+
+.catalog-filter__option--checkbox.is-selected:hover {
+    background: #F5F5F5;
+}
+
+/* ============================================
+   Теги — чипсы в мультивыборе
+   ============================================ */
+
+.catalog-filter__list--chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    min-width: 320px;      /* шире, чем обычный список — там чипсы */
+    max-width: 420px;
+    max-height: none;      /* не нужен вертикальный скролл для чипсов */
+    overflow: visible;
+}
+
+/* Чипс */
+.catalog-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: #F5F5F5;
+    border: 1px solid transparent;
+    border-radius: 100px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #121419;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.catalog-tag:hover {
+    background: #E5E5E5;
+}
+
+/* Выбранный чипс — голубой фон, синий текст */
+.catalog-tag.is-selected {
+    background: #D6E7FF;
+    color: #3B82F6;
+    border-color: #D6E7FF;
+}
+
+.catalog-tag.is-selected:hover {
+    background: #C5DCFF;
+}
+
+/* ============================================
+   Цена — панель
+   ============================================ */
+
+.catalog-filter__list--price {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    min-width: 320px;
+    width: 320px;
+    max-height: none;
+    overflow: visible;
+}
+
+/* Чекбокс «Только бесплатные» */
+.catalog-price__free {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 15px;
+    color: #121419;
+}
+
+.catalog-price__free-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #B5B5B5;
+    border-radius: 4px;
+    background: #fff;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    color: transparent;
+}
+
+.catalog-price__free-box svg {
+    width: 12px;
+    height: 10px;
+    display: block;
+}
+
+.catalog-price__free-input:checked + .catalog-price__free-box {
+    background: #121419;
+    border-color: #121419;
+    color: #fff;
+}
+
+.catalog-price__free:hover .catalog-price__free-box {
+    border-color: #121419;
+}
+
+/* Разделитель */
+.catalog-price__divider {
+    height: 1px;
+    background: #E5E5E5;
+    margin: 2px 0;
+}
+
+/* Поля От / До */
+.catalog-price__row {
+    display: flex;
+    gap: 10px;
+}
+
+.catalog-price__input {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #121419;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+
+    /* убираем стрелки у number */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.catalog-price__input::-webkit-outer-spin-button,
+.catalog-price__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.catalog-price__input::placeholder {
+    color: #B5B5B5;
+}
+
+.catalog-price__input:focus {
+    border-color: #121419;
+}
+
+/* Кнопка «Применить» */
+.catalog-price__apply {
+    align-self: center;
+    height: 48px;
+    padding: 0 28px;
+    background: #121419;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 4px;
+}
+
+.catalog-price__apply:hover {
+    background: #454545;
+}
+
+/* ============================================
+   Сортировка — панель с радиокнопками
+   ============================================ */
+
+.catalog-filter__list--radio {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    min-width: 220px;
+    width: max-content;
+    max-height: none;
+    overflow: visible;
+}
+
+/* Строка-опция */
+.catalog-sort {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #121419;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.catalog-sort:hover {
+    background: #F5F5F5;
+}
+
+/* Радио-кружок */
+.catalog-sort__radio {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #B5B5B5;
+    border-radius: 50%;
+    background: #fff;
+    position: relative;
+    transition: border-color 0.15s ease;
+}
+
+/* Точка внутри — только у выбранного */
+.catalog-sort__radio::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #121419;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.catalog-sort:hover .catalog-sort__radio {
+    border-color: #121419;
+}
+
+/* Текст */
+.catalog-sort__text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Стрелки ↑↓ */
+.catalog-sort__arrow {
+    flex-shrink: 0;
+    color: currentColor;
+    transition: color 0.15s ease;
+}
+
+/* Активное состояние */
+.catalog-sort.is-selected .catalog-sort__radio {
+    border-color: #121419;
+}
+
+.catalog-sort.is-selected .catalog-sort__radio::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.catalog-sort.is-selected {
+    color: #121419;
+    font-weight: 500;
+}
+
+/* ============================================
+   Чипсы активных фильтров
+   ============================================ */
+
+.catalog-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 23px;
+    font-size: 14px;
+}
+
+.catalog-chips__count {
+    color: #737373;
+    font-size: 14px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* Контейнер для чипсов */
+.catalog-chips__list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Один чипс */
+.catalog-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 14px;
+    background: #E5E5E5;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #121419;
+    cursor: default;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Чипс тега — голубой */
+.catalog-chip--tag {
+    background: #D6E7FF;
+    color: #3B82F6;
+}
+
+.catalog-chip--tag:hover {
+    background: #C5DCFF;
+}
+
+/* Крестик */
+.catalog-chip__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: currentColor;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+
+.catalog-chip__close:hover {
+    opacity: 1;
+}
+
+.catalog-chip__close svg {
+    display: block;
+    width: 12px;
+    height: 12px;
+}
+
+/* Плашка «+N» */
+.catalog-chips__more {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    background: #D6E7FF;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 500;
+    color: #3B82F6;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+.catalog-chips__more:hover {
+    background: #C5DCFF;
+}
+
+/* Скрытая плашка */
+.catalog-chips__more[hidden] {
+    display: none;
+}
+
+/* Кнопка «Сбросить всё» */
+.catalog-chips__reset {
+    color: #EF4444;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 8px;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.catalog-chips__reset:hover {
+    opacity: 0.7;
+}
+
+/* Скрываем кнопку «Сбросить всё», если фильтров нет */
+.catalog-chips__reset[hidden] {
+    display: none;
+}

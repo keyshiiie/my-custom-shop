@@ -5,3 +5,5 @@ import './modules/cart-button.js';
 import './modules/hero-video-zoom.js';
 import './modules/scroll-reveal.js';
 import './modules/menu-highlight.js';
+import './modules/catalog-filters.js';
+import './modules/catalog-chips.js';

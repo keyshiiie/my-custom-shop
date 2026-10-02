@@ -32,7 +32,7 @@
     display: flex;
     list-style: none;
     gap: 8px;              /* уменьшили с 32px, т.к. padding теперь у всех */
-    margin-left: 155px;
+    margin-left: 175px;
 }
 
 .nav-menu a {
