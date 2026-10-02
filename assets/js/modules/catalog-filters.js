@@ -21,7 +21,7 @@
         }
 
         // --------------------------------------------
-        // Инициализация
+        // Инициализация каждого фильтра
         // --------------------------------------------
         filters.forEach(function (filter) {
             const toggle  = filter.querySelector('.catalog-filter__toggle');
@@ -52,7 +52,7 @@
             });
 
             // --------------------------------------------
-            // Кликабельные элементы внутри фильтра
+            // Кликабельные элементы внутри
             // --------------------------------------------
             const clickables = filter.querySelectorAll(
                 '.catalog-filter__option, .catalog-tag, .catalog-sort'
@@ -60,22 +60,17 @@
 
             clickables.forEach(function (option) {
                 option.addEventListener('click', function () {
-                    // НЕ вызываем stopPropagation —
-                    // пусть событие всплывёт, чтобы catalog-chips.js узнал об изменении
-
-                    // ----------------------------------------
-                    // Мультивыбор (чекбоксы / чипсы)
-                    // ----------------------------------------
+                    // ----------- Мультивыбор -----------
                     if (isMulti) {
                         option.classList.toggle('is-selected');
                         const selected = option.classList.contains('is-selected');
                         option.setAttribute('aria-selected', selected ? 'true' : 'false');
+
+                        document.dispatchEvent(new CustomEvent('catalog:filter-changed'));
                         return;
                     }
 
-                    // ----------------------------------------
-                    // Радио-сортировка
-                    // ----------------------------------------
+                    // ----------- Радио (сортировка) -----------
                     if (isRadio) {
                         clickables.forEach(function (o) {
                             o.classList.remove('is-selected');
@@ -83,12 +78,12 @@
                         });
                         option.classList.add('is-selected');
                         option.setAttribute('aria-checked', 'true');
+
+                        document.dispatchEvent(new CustomEvent('catalog:filter-changed'));
                         return;
                     }
 
-                    // ----------------------------------------
-                    // Обычный одиночный выбор (fallback)
-                    // ----------------------------------------
+                    // ----------- Обычный одиночный выбор -----------
                     const value = option.dataset.value;
                     const text  = option.textContent.trim();
 
@@ -103,6 +98,8 @@
 
                     filter.classList.remove('is-open');
                     toggle.setAttribute('aria-expanded', 'false');
+
+                    document.dispatchEvent(new CustomEvent('catalog:filter-changed'));
                 });
             });
 
@@ -114,15 +111,10 @@
                 applyBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
 
-                    const inputs   = filter.querySelectorAll('.catalog-price__input');
-                    const min      = inputs[0] ? inputs[0].value : '';
-                    const max      = inputs[1] ? inputs[1].value : '';
-                    const freeOnly = !!filter.querySelector('.catalog-price__free-input')?.checked;
-
                     filter.classList.remove('is-open');
                     toggle.setAttribute('aria-expanded', 'false');
 
-                    console.log('Цена:', { min, max, freeOnly });
+                    document.dispatchEvent(new CustomEvent('catalog:price-applied'));
                 });
             }
         });

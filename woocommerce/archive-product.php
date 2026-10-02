@@ -3,6 +3,65 @@ defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
 ?>
+<?php
+// Восстанавливаем активные фильтры из GET при загрузке
+$active_categories = array_filter( explode( ',', $_GET['categories'] ?? '' ) );
+$active_tags       = array_filter( explode( ',', $_GET['tags'] ?? '' ) );
+$active_sort       = $_GET['sort'] ?? '';
+$active_price_min  = $_GET['price_min'] ?? '';
+$active_price_max  = $_GET['price_max'] ?? '';
+$active_free_only  = ! empty( $_GET['free_only'] );
+
+// Модифицируем основной запрос WooCommerce
+add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_tags, $active_price_min, $active_price_max, $active_free_only, $active_sort ) {
+    if ( ! $q->is_main_query() || is_admin() ) return;
+    if ( ! $q->is_post_type_archive( 'product' ) && ! $q->is_tax( 'product_cat' ) ) return;
+
+    // tax_query
+    $tax_query = $q->get( 'tax_query' ) ?: array();
+
+    if ( $active_categories ) {
+        $tax_query[] = array( 'taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $active_categories );
+    }
+    if ( $active_tags ) {
+        $tax_query[] = array( 'taxonomy' => 'product_tag', 'field' => 'slug', 'terms' => $active_tags );
+    }
+    if ( $tax_query ) $q->set( 'tax_query', $tax_query );
+
+    // meta_query
+    $meta_query = $q->get( 'meta_query' ) ?: array();
+
+    if ( $active_free_only ) {
+        $meta_query[] = array( 'key' => '_price', 'value' => 0, 'compare' => '<=', 'type' => 'NUMERIC' );
+    } else {
+        if ( $active_price_min !== '' ) {
+            $meta_query[] = array( 'key' => '_price', 'value' => (float) $active_price_min, 'compare' => '>=', 'type' => 'NUMERIC' );
+        }
+        if ( $active_price_max !== '' ) {
+            $meta_query[] = array( 'key' => '_price', 'value' => (float) $active_price_max, 'compare' => '<=', 'type' => 'NUMERIC' );
+        }
+    }
+    if ( $meta_query ) $q->set( 'meta_query', $meta_query );
+
+    // sort
+    if ( $active_sort === 'price-asc' ) {
+        $q->set( 'meta_key', '_price' );
+        $q->set( 'orderby', 'meta_value_num' );
+        $q->set( 'order', 'ASC' );
+    } elseif ( $active_sort === 'price-desc' ) {
+        $q->set( 'meta_key', '_price' );
+        $q->set( 'orderby', 'meta_value_num' );
+        $q->set( 'order', 'DESC' );
+    } elseif ( $active_sort === 'popularity' ) {
+        $q->set( 'meta_key', 'total_sales' );
+        $q->set( 'orderby', 'meta_value_num' );
+        $q->set( 'order', 'DESC' );
+    } elseif ( $active_sort === 'date' ) {
+        $q->set( 'orderby', 'date' );
+        $q->set( 'order', 'DESC' );
+    }
+} );
+?>
 
 <div class="catalog-page">
     <div class="container">
@@ -59,10 +118,10 @@ get_header( 'shop' );
                         if ( ! is_wp_error( $terms ) ) :
                             foreach ( $terms as $term ) :
                                 ?>
-                                <li class="catalog-filter__option catalog-filter__option--checkbox"
+                                <li class="catalog-filter__option catalog-filter__option--checkbox
+                                    <?php echo in_array( $term->slug, $active_categories, true ) ? 'is-selected' : ''; ?>"
                                     data-value="<?php echo esc_attr( $term->slug ); ?>"
-                                    role="option"
-                                    aria-selected="false">
+                                    aria-selected="<?php echo in_array( $term->slug, $active_categories, true ) ? 'true' : 'false'; ?>">
                                     <span class="catalog-filter__checkbox" aria-hidden="true">
                                         <svg class="catalog-filter__check" width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -95,10 +154,9 @@ get_header( 'shop' );
                             foreach ( $tags as $tag ) :
                                 ?>
                                 <button type="button"
-                                        class="catalog-tag"
+                                        class="catalog-tag <?php echo in_array( $tag->slug, $active_tags, true ) ? 'is-selected' : ''; ?>"
                                         data-value="<?php echo esc_attr( $tag->slug ); ?>"
-                                        role="option"
-                                        aria-selected="false">
+                                        aria-selected="<?php echo in_array( $tag->slug, $active_tags, true ) ? 'true' : 'false'; ?>">
                                     #<?php echo esc_html( $tag->name ); ?>
                                 </button>
                                 <?php
@@ -198,55 +256,50 @@ get_header( 'shop' );
                 Найдено: <?php echo esc_html( $GLOBALS['wp_query']->found_posts ); ?>
             </span>
 
-            <!-- Активные чипсы (рендерит JS) -->
-            <div class="catalog-chips__list" data-chips-list>
-                <!-- сюда JS добавит чипсы -->
-            </div>
+            <div class="catalog-chips__list" data-chips-list></div>
 
             <button type="button" class="catalog-chips__more" data-chips-more hidden>
-                <span data-chips-more-count>0</span>
+                <span data-chips-more-count></span>
             </button>
 
-            <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="catalog-chips__reset" data-chips-reset>
+            <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"
+            class="catalog-chips__reset"
+            data-chips-reset
+            hidden>
                 Сбросить всё
             </a>
         </div>
 
         <!-- 5. Сетка товаров -->
-        <?php if ( woocommerce_product_loop() ) : ?>
+        <div class="catalog-results" data-catalog-results>
 
-            <?php
-            /**
-             * woocommerce_before_shop_loop
-             * Здесь WC обычно выводит result count и сортировку — мы их уже сверстали выше,
-             * поэтому отключаем через remove_action в functions.php (см. ниже).
-             */
-            do_action( 'woocommerce_before_shop_loop' );
+            <?php if ( woocommerce_product_loop() ) : ?>
 
-            woocommerce_product_loop_start();
+                <?php
+                do_action( 'woocommerce_before_shop_loop' );
 
-            if ( wc_get_loop_prop( 'total' ) ) {
-                while ( have_posts() ) {
-                    the_post();
-                    do_action( 'woocommerce_shop_loop' );
-                    wc_get_template_part( 'content', 'product' );
+                woocommerce_product_loop_start();
+
+                if ( wc_get_loop_prop( 'total' ) ) {
+                    while ( have_posts() ) {
+                        the_post();
+                        do_action( 'woocommerce_shop_loop' );
+                        wc_get_template_part( 'content', 'product' );
+                    }
                 }
-            }
 
-            woocommerce_product_loop_end();
+                woocommerce_product_loop_end();
 
-            /**
-             * woocommerce_after_shop_loop
-             * Пагинация.
-             */
-            do_action( 'woocommerce_after_shop_loop' );
-            ?>
+                do_action( 'woocommerce_after_shop_loop' );
+                ?>
 
-        <?php else : ?>
+            <?php else : ?>
 
-            <?php do_action( 'woocommerce_no_products_found' ); ?>
+                <?php do_action( 'woocommerce_no_products_found' ); ?>
 
-        <?php endif; ?>
+            <?php endif; ?>
+
+        </div>
     </div>
 </div>
 

@@ -196,3 +196,168 @@ function my_theme_enqueue_catalog_styles() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_catalog_styles', 15 );
+
+/**
+ * AJAX-фильтрация каталога.
+ */
+function my_theme_ajax_filter_catalog() {
+    // --- Собираем параметры ---
+    $paged       = max( 1, (int) ( $_GET['paged'] ?? 1 ) );
+    $categories  = array_filter( array_map( 'sanitize_title', explode( ',', $_GET['categories'] ?? '' ) ) );
+    $tags        = array_filter( array_map( 'sanitize_title', explode( ',', $_GET['tags'] ?? '' ) ) );
+    $price_min   = isset( $_GET['price_min'] ) && $_GET['price_min'] !== '' ? (float) $_GET['price_min'] : null;
+    $price_max   = isset( $_GET['price_max'] ) && $_GET['price_max'] !== '' ? (float) $_GET['price_max'] : null;
+    $free_only   = ! empty( $_GET['free_only'] );
+    $sort        = sanitize_key( $_GET['sort'] ?? '' );
+    $search      = sanitize_text_field( $_GET['search'] ?? '' );
+
+    // --- Базовый запрос ---
+    $args = array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => 9,
+        'paged'          => $paged,
+    );
+
+    // --- tax_query ---
+    $tax_query = array( 'relation' => 'AND' );
+
+    if ( ! empty( $categories ) ) {
+        $tax_query[] = array(
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => $categories,
+        );
+    }
+
+    if ( ! empty( $tags ) ) {
+        $tax_query[] = array(
+            'taxonomy' => 'product_tag',
+            'field'    => 'slug',
+            'terms'    => $tags,
+        );
+    }
+
+    if ( count( $tax_query ) > 1 ) {
+        $args['tax_query'] = $tax_query;
+    }
+
+    // --- meta_query (цена) ---
+    $meta_query = array( 'relation' => 'AND' );
+
+    // «Только бесплатные» — товары с ценой 0
+    if ( $free_only ) {
+        $meta_query[] = array(
+            'key'     => '_price',
+            'value'   => 0,
+            'compare' => '<=',
+            'type'    => 'NUMERIC',
+        );
+    } else {
+        if ( $price_min !== null ) {
+            $meta_query[] = array(
+                'key'     => '_price',
+                'value'   => $price_min,
+                'compare' => '>=',
+                'type'    => 'NUMERIC',
+            );
+        }
+        if ( $price_max !== null ) {
+            $meta_query[] = array(
+                'key'     => '_price',
+                'value'   => $price_max,
+                'compare' => '<=',
+                'type'    => 'NUMERIC',
+            );
+        }
+    }
+
+    if ( count( $meta_query ) > 1 ) {
+        $args['meta_query'] = $meta_query;
+    }
+
+    // --- Сортировка ---
+    switch ( $sort ) {
+        case 'popularity':
+            $args['orderby']  = 'meta_value_num';
+            $args['meta_key'] = 'total_sales';
+            $args['order']    = 'DESC';
+            break;
+        case 'date':
+            $args['orderby'] = 'date';
+            $args['order']   = 'DESC';
+            break;
+        case 'price-asc':
+            $args['orderby']  = 'meta_value_num';
+            $args['meta_key'] = '_price';
+            $args['order']    = 'ASC';
+            break;
+        case 'price-desc':
+            $args['orderby']  = 'meta_value_num';
+            $args['meta_key'] = '_price';
+            $args['order']    = 'DESC';
+            break;
+        default:
+            $args['orderby'] = 'menu_order';
+            $args['order']   = 'ASC';
+    }
+
+    // --- Поиск ---
+    if ( $search ) {
+        $args['s'] = $search;
+    }
+
+    // --- Выполняем запрос ---
+    $query = new WP_Query( $args );
+
+    // --- Рендерим карточки ---
+    ob_start();
+
+    if ( $query->have_posts() ) {
+        while ( $query->have_posts() ) {
+            $query->the_post();
+            wc_get_template_part( 'content', 'product' );
+        }
+    }
+    wp_reset_postdata();
+
+    $html = ob_get_clean();
+
+    // --- Пагинация ---
+    $pagination_html = '';
+
+    if ( $query->max_num_pages > 1 ) {
+        $pagination_html = paginate_links( array(
+            'base'      => '#page/%#%',
+            'format'    => '',
+            'current'   => $paged,
+            'total'     => $query->max_num_pages,
+            'type'      => 'plain',
+            'prev_text' => '‹',
+            'next_text' => '›',
+        ) );
+    }
+
+    // --- Ответ ---
+    wp_send_json_success( array(
+        'html'        => $html,
+        'pagination'  => $pagination_html,
+        'found_posts' => $query->found_posts,
+        'max_pages'   => $query->max_num_pages,
+        'current'     => $paged,
+    ) );
+}
+
+add_action( 'wp_ajax_filter_catalog',        'my_theme_ajax_filter_catalog' );
+add_action( 'wp_ajax_nopriv_filter_catalog', 'my_theme_ajax_filter_catalog' );
+
+function my_theme_localize_ajax_url() {
+    wp_localize_script(
+        'theme-main',
+        'catalog_ajax',
+        array(
+            'url' => admin_url( 'admin-ajax.php' ),
+        )
+    );
+}
+add_action( 'wp_enqueue_scripts', 'my_theme_localize_ajax_url', 20 );

@@ -795,3 +795,19 @@
 .catalog-chips__reset[hidden] {
     display: none;
 }
+
+/* Состояние загрузки */
+.catalog-results.is-loading {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+/* Пустой результат */
+.catalog-empty {
+    padding: 60px 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #737373;
+    grid-column: 1 / -1;
+}

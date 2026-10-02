@@ -1,3 +1,7 @@
+// ============================================
+// Точка входа
+// ============================================
+
 import './modules/bestsellers-slider.js';
 import './modules/faq-accordion.js';
 import './modules/hero-highlight.js';
@@ -5,5 +9,7 @@ import './modules/cart-button.js';
 import './modules/hero-video-zoom.js';
 import './modules/scroll-reveal.js';
 import './modules/menu-highlight.js';
+
 import './modules/catalog-filters.js';
 import './modules/catalog-chips.js';
+import './modules/catalog-ajax.js';

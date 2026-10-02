@@ -11,17 +11,18 @@
         const chipsContainer = document.querySelector('.catalog-chips');
         if (!chipsContainer) return;
 
-        const listEl       = chipsContainer.querySelector('[data-chips-list]');
-        const moreBtn      = chipsContainer.querySelector('[data-chips-more]');
-        const moreCountEl  = chipsContainer.querySelector('[data-chips-more-count]');
-        const resetBtn     = chipsContainer.querySelector('[data-chips-reset]');
+        const listEl      = chipsContainer.querySelector('[data-chips-list]');
+        const moreBtn     = chipsContainer.querySelector('[data-chips-more]');
+        const moreCountEl = chipsContainer.querySelector('[data-chips-more-count]');
+        const resetBtn    = chipsContainer.querySelector('[data-chips-reset]');
 
         if (!listEl) return;
 
         // --------------------------------------------
-        // Состояние: массив { type, value, label }
+        // Состояние
         // --------------------------------------------
         let activeFilters = [];
+        let isExpanded = false;
 
         // --------------------------------------------
         // Собрать активные фильтры из DOM
@@ -29,9 +30,9 @@
         function collectActive() {
             const result = [];
 
-            // Категории (чекбоксы)
+            // Категории
             document.querySelectorAll(
-                '.catalog-filter[data-filter="category"] .is-selected'
+                '.catalog-filter[data-filter="category"] .catalog-filter__option--checkbox.is-selected'
             ).forEach(function (el) {
                 result.push({
                     type: 'category',
@@ -40,19 +41,18 @@
                 });
             });
 
-            // Теги (чипсы)
+            // Теги
             document.querySelectorAll(
                 '.catalog-filter[data-filter="tag"] .catalog-tag.is-selected'
             ).forEach(function (el) {
-                const text = el.textContent.trim(); // уже с #
                 result.push({
                     type: 'tag',
                     value: el.dataset.value,
-                    label: text,
+                    label: el.textContent.trim(),
                 });
             });
 
-            // Сортировка (radio)
+            // Сортировка
             document.querySelectorAll(
                 '.catalog-filter[data-filter="sort"] .catalog-sort.is-selected'
             ).forEach(function (el) {
@@ -64,16 +64,16 @@
                 });
             });
 
-            // Цена (панель)
+            // Цена
             const priceFilter = document.querySelector('.catalog-filter[data-filter="price"]');
             if (priceFilter) {
                 const min  = priceFilter.querySelectorAll('.catalog-price__input')[0]?.value || '';
                 const max  = priceFilter.querySelectorAll('.catalog-price__input')[1]?.value || '';
                 const free = priceFilter.querySelector('.catalog-price__free-input')?.checked || false;
 
-                if (min) result.push({ type: 'price-min', value: min, label: 'от ' + min + '₽' });
-                if (max) result.push({ type: 'price-max', value: max, label: 'до ' + max + '₽' });
-                if (free) result.push({ type: 'price-free', value: '1', label: 'Бесплатные' });
+                if (min)  result.push({ type: 'price-min',  value: min,   label: 'от ' + min + '₽' });
+                if (max)  result.push({ type: 'price-max',  value: max,   label: 'до ' + max + '₽' });
+                if (free) result.push({ type: 'price-free', value: '1',   label: 'Бесплатные' });
             }
 
             activeFilters = result;
@@ -83,8 +83,6 @@
         // --------------------------------------------
         // Отрисовать чипсы
         // --------------------------------------------
-        let isExpanded = false;
-
         function renderChips() {
             const items = activeFilters;
             listEl.innerHTML = '';
@@ -97,7 +95,6 @@
 
             if (resetBtn) resetBtn.hidden = false;
 
-            // Сколько показываем
             const visibleCount = isExpanded ? items.length : MAX_VISIBLE;
             const visible = items.slice(0, visibleCount);
             const hiddenCount = items.length - visibleCount;
@@ -117,7 +114,6 @@
                         '</svg>' +
                     '</button>';
 
-                // Клик по крестику — снять фильтр
                 chip.querySelector('.catalog-chip__close').addEventListener('click', function (e) {
                     e.stopPropagation();
                     removeFilter(item);
@@ -126,13 +122,12 @@
                 listEl.appendChild(chip);
             });
 
-            // Плашка «+N»
+            // Плашка «+N» / «−»
             if (!isExpanded && hiddenCount > 0) {
                 moreBtn.hidden = false;
                 moreCountEl.textContent = '+' + hiddenCount;
                 moreBtn.setAttribute('aria-label', 'Показать ещё ' + hiddenCount + ' фильтров');
             } else if (isExpanded && items.length > MAX_VISIBLE) {
-                // В раскрытом состоянии — можно свернуть обратно
                 moreBtn.hidden = false;
                 moreCountEl.textContent = '−';
                 moreBtn.setAttribute('aria-label', 'Свернуть');
@@ -169,8 +164,8 @@
                     el.setAttribute('aria-checked', 'false');
                 });
             } else if (item.type === 'price-min') {
-                const input = document.querySelector('.catalog-filter[data-filter="price"] .catalog-price__input');
-                if (input) input.value = '';
+                const inputs = document.querySelectorAll('.catalog-filter[data-filter="price"] .catalog-price__input');
+                if (inputs[0]) inputs[0].value = '';
             } else if (item.type === 'price-max') {
                 const inputs = document.querySelectorAll('.catalog-filter[data-filter="price"] .catalog-price__input');
                 if (inputs[1]) inputs[1].value = '';
@@ -179,7 +174,11 @@
                 if (cb) cb.checked = false;
             }
 
-            refresh();
+            collectActive();
+            renderChips();
+
+            // Сообщаем AJAX-модулю, что фильтры изменились
+            document.dispatchEvent(new CustomEvent('catalog:filter-changed'));
         }
 
         // --------------------------------------------
@@ -190,7 +189,9 @@
             renderChips();
         }
 
+        // --------------------------------------------
         // Показать/скрыть всё
+        // --------------------------------------------
         if (moreBtn) {
             moreBtn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -199,12 +200,13 @@
             });
         }
 
+        // --------------------------------------------
         // «Сбросить всё»
+        // --------------------------------------------
         if (resetBtn) {
             resetBtn.addEventListener('click', function (e) {
                 e.preventDefault();
 
-                // Снять все чекбоксы категорий
                 document.querySelectorAll(
                     '.catalog-filter[data-filter="category"] .is-selected'
                 ).forEach(function (el) {
@@ -212,7 +214,6 @@
                     el.setAttribute('aria-selected', 'false');
                 });
 
-                // Снять все чипсы тегов
                 document.querySelectorAll(
                     '.catalog-filter[data-filter="tag"] .catalog-tag.is-selected'
                 ).forEach(function (el) {
@@ -220,7 +221,6 @@
                     el.setAttribute('aria-selected', 'false');
                 });
 
-                // Снять радио сортировки
                 document.querySelectorAll(
                     '.catalog-filter[data-filter="sort"] .catalog-sort.is-selected'
                 ).forEach(function (el) {
@@ -228,47 +228,44 @@
                     el.setAttribute('aria-checked', 'false');
                 });
 
-                // Очистить поля цены
                 document.querySelectorAll(
                     '.catalog-filter[data-filter="price"] .catalog-price__input'
                 ).forEach(function (el) { el.value = ''; });
+
                 const freeCb = document.querySelector(
                     '.catalog-filter[data-filter="price"] .catalog-price__free-input'
                 );
                 if (freeCb) freeCb.checked = false;
 
+                const searchInput = document.querySelector('.catalog-search__input');
+                if (searchInput) searchInput.value = '';
+
                 isExpanded = false;
                 refresh();
+
+                document.dispatchEvent(new CustomEvent('catalog:filters-reset'));
             });
         }
 
         // --------------------------------------------
-        // Слушаем изменения в фильтрах
+        // Слушаем события из catalog-filters.js
         // --------------------------------------------
-        // Клики по чекбоксам, тегам, радиокнопкам
-        document.addEventListener('click', function (e) {
-            if (e.target.closest('.catalog-filter')) {
-                // Дадим другим обработчикам сначала отработать
-                setTimeout(refresh, 0);
-            }
+        document.addEventListener('catalog:filter-changed', function () {
+            refresh();
         });
 
-        // Ввод в полях цены и переключение чекбокса «Бесплатные»
-        document.addEventListener('change', function (e) {
-            if (e.target.closest('.catalog-filter[data-filter="price"]')) {
-                refresh();
-            }
+        document.addEventListener('catalog:price-applied', function () {
+            refresh();
         });
 
-        // Кнопка «Применить» в цене
-        document.addEventListener('click', function (e) {
-            if (e.target.closest('.catalog-price__apply')) {
-                setTimeout(refresh, 0);
-            }
+        // После AJAX-запроса — пересобрать чипсы (на случай рассинхрона)
+        document.addEventListener('catalog:filters-applied', function () {
+            collectActive();
+            renderChips();
         });
 
         // --------------------------------------------
-        // Утилита — экранирование HTML
+        // Утилита
         // --------------------------------------------
         function escapeHtml(str) {
             return String(str)
@@ -280,14 +277,11 @@
         }
 
         // --------------------------------------------
-        // Первый рендер
+        // Первый рендер (учтёт GET-параметры, если они есть)
         // --------------------------------------------
         refresh();
     }
 
-    // --------------------------------------------
-    // Запуск
-    // --------------------------------------------
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
