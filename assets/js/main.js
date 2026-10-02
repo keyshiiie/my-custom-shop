@@ -15,3 +15,5 @@ import './modules/catalog-chips.js';
 import './modules/catalog-ajax.js';
 
 import './modules/product-gallery.js';
+
+import './modules/cart.js';
