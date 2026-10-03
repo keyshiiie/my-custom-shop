@@ -7,7 +7,6 @@
  */
 
 defined( 'ABSPATH' ) || exit;
-
 ?>
 
 <div class="cart-page">
@@ -21,8 +20,6 @@ defined( 'ABSPATH' ) || exit;
             <?php
             $source = my_theme_cart_breadcrumb_source();
 
-            // Если источник — каталог, но не пришёл явный ?from=catalog,
-            // всё равно добавим «Каталог» для контекста (опционально).
             if ( ! $source ) {
                 $source = [
                     'label' => 'Каталог',
@@ -46,7 +43,7 @@ defined( 'ABSPATH' ) || exit;
         <?php if ( WC()->cart->is_empty() ) : ?>
 
             <div class="cart-empty">
-                <p><?php esc_html_e( 'Корзина пуста.', 'woocommerce' ); ?></p>
+                <p>Корзина пуста.</p>
                 <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-dark">
                     В каталог
                 </a>
@@ -75,9 +72,17 @@ defined( 'ABSPATH' ) || exit;
                                 <span class="cart-select-all__text">Выбрать всё</span>
                             </label>
 
-                            <a href="<?php echo esc_url( add_query_arg( 'clear-cart', '1', wc_get_cart_url() ) ); ?>"
+                            <?php
+                            // wp_nonce_url() добавляет &_wpnonce=...
+                            // my_theme_handle_clear_cart() в functions.php проверяет его.
+                            $clear_url = wp_nonce_url(
+                                add_query_arg( 'clear-cart', '1', wc_get_cart_url() ),
+                                'clear_cart'
+                            );
+                            ?>
+                            <a href="<?php echo esc_url( $clear_url ); ?>"
                                class="cart-clear"
-                               onclick="return confirm('Очистить корзину?');">
+                               data-confirm="Очистить корзину?">
                                 Очистить корзину
                             </a>
                         </div>
@@ -103,9 +108,9 @@ defined( 'ABSPATH' ) || exit;
                                     $cart_item_key
                                 );
 
-                                $thumbnail   = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail' ), $cart_item, $cart_item_key );
-                                $short_desc  = $_product->get_short_description();
-                                $price_html  = WC()->cart->get_product_subtotal( $_product, 1 );
+                                $thumbnail  = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail' ), $cart_item, $cart_item_key );
+                                $short_desc = $_product->get_short_description();
+                                $price_html = WC()->cart->get_product_subtotal( $_product, 1 );
                                 ?>
                                 <div class="cart-item" data-cart-item="<?php echo esc_attr( $cart_item_key ); ?>">
 
@@ -147,7 +152,7 @@ defined( 'ABSPATH' ) || exit;
                                     <!-- Удалить -->
                                     <a href="<?php echo esc_url( wc_get_cart_remove_url( $cart_item_key ) ); ?>"
                                        class="cart-item__remove"
-                                       aria-label="Удалить товар"
+                                       aria-label="<?php echo esc_attr( sprintf( 'Удалить «%s» из корзины', $_product->get_name() ) ); ?>"
                                        data-cart-item-remove>
                                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M10.75 0.75L0.75 10.75M0.75 0.75L10.75 10.75" stroke="#121419" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -170,10 +175,7 @@ defined( 'ABSPATH' ) || exit;
 
                     <!-- ПРАВАЯ КОЛОНКА -->
                     <aside class="cart-summary reveal reveal--fade">
-                        <?php
-                        // Рендерим кастомный cart-totals.php из темы
-                        woocommerce_cart_totals();
-                        ?>
+                        <?php woocommerce_cart_totals(); ?>
                     </aside>
 
                 </div>

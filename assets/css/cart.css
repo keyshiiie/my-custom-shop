@@ -347,3 +347,45 @@
     padding-bottom: 0 !important;
     border-width: 0 !important;
 }
+
+/* Анимация для пустого состояния */
+.cart-empty {
+    padding: 40px 0;
+    text-align: center;
+}
+
+.cart-empty p {
+    font-size: 18px;
+    color: #737373;
+    margin-bottom: 20px;
+}
+
+/* Кнопка «Очистить корзину» в состоянии загрузки */
+.cart-clear.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: progress;
+}
+
+
+.cart-page .container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.cart-empty p {
+    font-size: 18px;
+    color: #737373;
+    margin-bottom: 20px;
+}

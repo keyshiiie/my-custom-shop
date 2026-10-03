@@ -872,6 +872,9 @@
 .catalog-page .woocommerce-pagination a.page-numbers.prev svg,
 .catalog-page .woocommerce-pagination a.page-numbers.next svg {
     display: block;
-    width: 8px;
-    height: 14px;
+    width: 5px;
+    height: 9px;
+    flex-shrink: 0;
+    color: #121419; 
 }
+

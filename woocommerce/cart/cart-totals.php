@@ -52,7 +52,7 @@ $cart = WC()->cart;
             <?php foreach ( $cart->get_coupons() as $code => $coupon ) : ?>
                 <li class="cart-summary__coupon">
                     <span><?php wc_cart_totals_coupon_label( $coupon ); ?></span>
-                    <span><?php wc_cart_totals_coupon_html( $coupon ); ?></span>
+                    <span><?php wc_cart_totals_coupon_html( $coupon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -71,7 +71,7 @@ $cart = WC()->cart;
     <?php foreach ( $cart->get_fees() as $fee ) : ?>
         <div class="cart-summary__fee">
             <span><?php echo esc_html( $fee->name ); ?></span>
-            <span><?php wc_cart_totals_fee_html( $fee ); ?></span>
+            <span><?php wc_cart_totals_fee_html( $fee ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
         </div>
     <?php endforeach; ?>
 
@@ -93,14 +93,16 @@ $cart = WC()->cart;
         </a>
     </div>
 
-    <p class="cart-summary__note">
-        <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.2"/>
-            <path d="M9 5.5V9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="9" cy="12.5" r="0.9" fill="currentColor"/>
-        </svg>
-        Для оплаты нужен аккаунт: после нажатия вы войдёте или зарегистрируетесь.
-    </p>
+    <?php if ( ! is_user_logged_in() ) : ?>
+        <p class="cart-summary__note">
+            <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M9 5.5V9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="9" cy="12.5" r="0.9" fill="currentColor"/>
+            </svg>
+            <?php esc_html_e( 'Для оплаты нужен аккаунт: после нажатия вы войдёте или зарегистрируетесь.', MY_THEME_TEXTDOMAIN ); ?>
+        </p>
+    <?php endif; ?>
 
     <?php do_action( 'woocommerce_after_cart_totals' ); ?>
 

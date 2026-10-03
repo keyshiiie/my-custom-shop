@@ -32,7 +32,7 @@
     display: flex;
     list-style: none;
     gap: 8px;              /* уменьшили с 32px, т.к. padding теперь у всех */
-    margin-left: 175px;
+    margin-left: 125px;
 }
 
 .nav-menu a {
@@ -68,7 +68,7 @@
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 25px;
 }
 
 .header-icon {
@@ -102,6 +102,10 @@
     justify-content: center;
 }
 
+.cart-count[hidden] {
+    display: none !important;
+}
+
 /* ============================================
    КНОПКА АККАУНТА
    ============================================ */
@@ -114,7 +118,7 @@
     color: #000;
     gap: 6px;
     border-color: transparent;
-    padding: 0 20px;
+    padding: 0 20px 0 0;
     transition: color 0.3s ease, opacity 0.3s ease;
 }
 
@@ -167,4 +171,17 @@
 .account-btn__arrow svg path {
     stroke: currentColor;   /* ← наследует цвет кнопки, меняется при ховере */
     transition: stroke 0.3s ease;
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 9999;
+    padding: 10px 15px;
+    background: #fff;
+    color: #000;
+}
+.skip-link:focus {
+    left: 0;
 }

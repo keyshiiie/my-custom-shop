@@ -1,52 +1,82 @@
+/**
+ * Cart page — AJAX-удаление товаров, очистка корзины,
+ * обновление итогов и пустое состояние.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.cart-page');
     if (!page) return;
 
     /* ==========================================================
+       0. Кнопки с data-confirm: «Очистить корзину»
+          — confirm всегда, AJAX только для .cart-clear
+       ========================================================== */
+    page.addEventListener('click', (e) => {
+        const clearBtn = e.target.closest('[data-confirm]');
+        if (!clearBtn) return;
+
+        const message = clearBtn.dataset.confirm;
+        if (message && !window.confirm(message)) {
+            e.preventDefault();
+            return;
+        }
+
+        if (clearBtn.classList.contains('cart-clear')) {
+            e.preventDefault();
+            clearCart(clearBtn);
+        }
+    });
+
+    /* ==========================================================
        1. Выбрать всё + синхронизация чекбоксов
        ========================================================== */
-    const selectAll  = page.querySelector('.cart-select-all__input');
-    const itemChecks = () => page.querySelectorAll('[data-cart-item-check]');
+    const selectAll = page.querySelector('.cart-select-all__input');
+    const getChecks = () => page.querySelectorAll('[data-cart-item-check]');
+
+    function syncSelectAll() {
+        if (!selectAll) return;
+        const checks = [...getChecks()];
+        const allOn  = checks.length > 0 && checks.every(c => c.checked);
+        selectAll.checked = allOn;
+    }
 
     if (selectAll) {
-        const sync = () => {
-            const checks = [...itemChecks()];
-            const allOn  = checks.length && checks.every(c => c.checked);
-            selectAll.checked = allOn;
-        };
-
         selectAll.addEventListener('change', () => {
-            itemChecks().forEach(c => { c.checked = selectAll.checked; });
+            getChecks().forEach(c => { c.checked = selectAll.checked; });
         });
 
         page.addEventListener('change', (e) => {
-            if (e.target.matches('[data-cart-item-check]')) sync();
+            if (e.target.matches('[data-cart-item-check]')) syncSelectAll();
         });
 
-        sync();
+        syncSelectAll();
     }
 
     /* ==========================================================
-       2. AJAX-удаление товара
+       2. AJAX — удаление одного товара и очистка корзины
        ========================================================== */
-    if (typeof cart_ajax === 'undefined') return;
+    if (typeof cart_ajax === 'undefined' || !cart_ajax.url) return;
 
+    const shopUrl      = cart_ajax.shop_url || '/shop/';
     const cartCountEl  = document.querySelector('.cart-count');
     const summaryList  = document.querySelector('[data-cart-summary-list]');
-    const summaryTotal = document.querySelector('[data-cart-summary-total]');
     const summaryCount = document.querySelector('[data-cart-summary-count]');
-    const checkoutBtn  = document.querySelector('[data-cart-checkout]');
 
     /**
-     * Анимация удаления + собственно удаление
+     * Возвращает актуальный элемент .cart-summary__total-sum.
+     */
+    function getSummaryTotalEl() {
+        return document.querySelector('[data-cart-summary-total]');
+    }
+
+    /**
+     * Удаление одного товара.
      */
     async function removeItem(link) {
-        const item  = link.closest('.cart-item');
-        const key   = item?.dataset.cartItem;
+        const item = link.closest('.cart-item');
+        const key  = item?.dataset.cartItem;
 
         if (!item || !key) return;
 
-        // Показываем загрузку
         item.classList.add('is-removing');
 
         const body = new URLSearchParams({
@@ -71,19 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = json.data;
 
-            // --- 1. Анимируем и удаляем карточку товара ---
             animateRemove(item);
 
-            // --- 2. Удаляем строку из «Ваш заказ» ---
             const summaryItem = summaryList?.querySelector(`[data-cart-item="${key}"]`);
             if (summaryItem) animateRemove(summaryItem);
 
-            // --- 3. Обновляем цифры ---
-            if (summaryTotal) summaryTotal.innerHTML = data.total_html;
-            if (summaryCount) summaryCount.textContent = data.items_count;
-            if (cartCountEl)  cartCountEl.textContent  = data.items_count;
+            updateCounters(data);
+            updateTotal(data);
 
-            // --- 4. Если корзина пуста — показываем пустое состояние ---
+            setTimeout(syncSelectAll, 50);
+
             if (data.is_empty) {
                 showEmptyState();
             }
@@ -95,40 +122,123 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Плавно убирает элемент: сначала opacity 0, потом height 0.
+     * AJAX-очистка корзины.
+     *
+     * @param {HTMLAnchorElement} btn
+     */
+    async function clearCart(btn) {
+        if (btn.classList.contains('is-loading')) return;
+
+        btn.classList.add('is-loading');
+        btn.setAttribute('aria-busy', 'true');
+
+        const body = new URLSearchParams({
+            action: 'my_theme_clear_cart',
+            nonce:  cart_ajax.nonce,
+        });
+
+        try {
+            const response = await fetch(cart_ajax.url, {
+                method:      'POST',
+                credentials: 'same-origin',
+                headers:     { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body:        body.toString(),
+            });
+
+            const json = await response.json();
+
+            if (!json.success) {
+                throw new Error(json.data?.message || 'Ошибка очистки');
+            }
+
+            const data = json.data;
+
+            updateCounters(data);
+            updateTotal(data);
+            showEmptyState();
+        } catch (err) {
+            btn.classList.remove('is-loading');
+            btn.removeAttribute('aria-busy');
+            console.error('[cart] clear error:', err);
+            alert('Не удалось очистить корзину. Попробуйте ещё раз.');
+        }
+    }
+
+    /**
+     * Обновляет количество в правой колонке и в бейдже хедера.
+     */
+    function updateCounters(data) {
+        if (summaryCount) {
+            summaryCount.textContent = data.items_count;
+        }
+
+        if (cartCountEl) {
+            cartCountEl.textContent = data.items_count;
+            if (data.items_count === 0) {
+                cartCountEl.setAttribute('hidden', '');
+            } else {
+                cartCountEl.removeAttribute('hidden');
+            }
+        }
+    }
+
+    /**
+     * Обновляет блок «Итого».
+     */
+    function updateTotal(data) {
+        const el = getSummaryTotalEl();
+        if (!el) return;
+        if (typeof data.total_html !== 'string') return;
+
+        el.innerHTML = data.total_html;
+    }
+
+    /**
+     * Плавно убирает элемент.
      */
     function animateRemove(el) {
-        el.style.height = el.offsetHeight + 'px';
+        if (!el || !el.parentNode) return;
+
+        const height = el.offsetHeight;
+        el.style.height   = height + 'px';
+        el.style.overflow = 'hidden';
+
         requestAnimationFrame(() => {
             el.classList.add('is-hidden');
             el.style.height = '0px';
-            el.addEventListener('transitionend', () => el.remove(), { once: true });
-            // на всякий случай — страховка, если transitionend не сработал
-            setTimeout(() => el.remove(), 500);
+
+            const cleanup = () => {
+                if (el.parentNode) el.remove();
+            };
+
+            el.addEventListener('transitionend', cleanup, { once: true });
+            setTimeout(cleanup, 500);
         });
     }
 
     /**
-     * Что показывать, когда корзина опустела.
+     * Показывает пустое состояние той же разметкой, что и SSR.
      */
     function showEmptyState() {
-        // Скрываем левую и правую колонки
-        document.querySelector('.cart-layout')?.remove();
-
-        // Показываем сообщение
         const container = page.querySelector('.container');
-        if (container && !page.querySelector('.cart-empty')) {
-            const div = document.createElement('div');
-            div.className = 'cart-empty reveal reveal--fade';
-            div.innerHTML = `
-                <p>Корзина пуста.</p>
-                <a href="/shop/" class="btn btn-dark">В каталог</a>
-            `;
-            container.appendChild(div);
-        }
+        if (!container) return;
+
+        const form = container.querySelector('.cart-form');
+        if (form) form.remove();
+
+        const oldEmpty = container.querySelector('.cart-empty');
+        if (oldEmpty) oldEmpty.remove();
+
+        const div = document.createElement('div');
+        div.className = 'cart-empty';
+        div.innerHTML = `
+            <p>Корзина пуста.</p>
+            <a href="${shopUrl}" class="btn btn-dark">В каталог</a>
+        `;
+        container.appendChild(div);
     }
 
-    /* Делегируем клик по всем крестикам */
+    /* Делегируем клик по крестикам удаления */
     page.addEventListener('click', (e) => {
         const link = e.target.closest('[data-cart-item-remove]');
         if (!link) return;

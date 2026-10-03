@@ -2,65 +2,21 @@
 defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
-?>
-<?php
-// Восстанавливаем активные фильтры из GET при загрузке
-$active_categories = array_filter( explode( ',', $_GET['categories'] ?? '' ) );
-$active_tags       = array_filter( explode( ',', $_GET['tags'] ?? '' ) );
-$active_sort       = $_GET['sort'] ?? '';
-$active_price_min  = $_GET['price_min'] ?? '';
-$active_price_max  = $_GET['price_max'] ?? '';
-$active_free_only  = ! empty( $_GET['free_only'] );
 
-// Модифицируем основной запрос WooCommerce
-add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_tags, $active_price_min, $active_price_max, $active_free_only, $active_sort ) {
-    if ( ! $q->is_main_query() || is_admin() ) return;
-    if ( ! $q->is_post_type_archive( 'product' ) && ! $q->is_tax( 'product_cat' ) ) return;
-
-    // tax_query
-    $tax_query = $q->get( 'tax_query' ) ?: array();
-
-    if ( $active_categories ) {
-        $tax_query[] = array( 'taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $active_categories );
-    }
-    if ( $active_tags ) {
-        $tax_query[] = array( 'taxonomy' => 'product_tag', 'field' => 'slug', 'terms' => $active_tags );
-    }
-    if ( $tax_query ) $q->set( 'tax_query', $tax_query );
-
-    // meta_query
-    $meta_query = $q->get( 'meta_query' ) ?: array();
-
-    if ( $active_free_only ) {
-        $meta_query[] = array( 'key' => '_price', 'value' => 0, 'compare' => '<=', 'type' => 'NUMERIC' );
-    } else {
-        if ( $active_price_min !== '' ) {
-            $meta_query[] = array( 'key' => '_price', 'value' => (float) $active_price_min, 'compare' => '>=', 'type' => 'NUMERIC' );
-        }
-        if ( $active_price_max !== '' ) {
-            $meta_query[] = array( 'key' => '_price', 'value' => (float) $active_price_max, 'compare' => '<=', 'type' => 'NUMERIC' );
-        }
-    }
-    if ( $meta_query ) $q->set( 'meta_query', $meta_query );
-
-    // sort
-    if ( $active_sort === 'price-asc' ) {
-        $q->set( 'meta_key', '_price' );
-        $q->set( 'orderby', 'meta_value_num' );
-        $q->set( 'order', 'ASC' );
-    } elseif ( $active_sort === 'price-desc' ) {
-        $q->set( 'meta_key', '_price' );
-        $q->set( 'orderby', 'meta_value_num' );
-        $q->set( 'order', 'DESC' );
-    } elseif ( $active_sort === 'popularity' ) {
-        $q->set( 'meta_key', 'total_sales' );
-        $q->set( 'orderby', 'meta_value_num' );
-        $q->set( 'order', 'DESC' );
-    } elseif ( $active_sort === 'date' ) {
-        $q->set( 'orderby', 'date' );
-        $q->set( 'order', 'DESC' );
-    }
-} );
+// Активные фильтры — только для подсветки UI.
+// Реальная фильтрация запроса — в functions.php
+// (my_theme_apply_catalog_filters_to_main_query).
+$active_categories = array_filter(
+    explode( ',', my_theme_get_string( $_GET['categories'] ?? '' ) )
+);
+$active_tags = array_filter(
+    explode( ',', my_theme_get_string( $_GET['tags'] ?? '' ) )
+);
+$active_sort      = sanitize_key( my_theme_get_string( $_GET['sort'] ?? '' ) );
+$active_price_min = my_theme_get_string( $_GET['price_min'] ?? '' );
+$active_price_max = my_theme_get_string( $_GET['price_max'] ?? '' );
+$active_free_only = ! empty( $_GET['free_only'] );
+$active_search    = sanitize_text_field( my_theme_get_string( $_GET['search'] ?? '' ) );
 ?>
 
 <div class="catalog-page">
@@ -303,5 +259,4 @@ add_action( 'pre_get_posts', function ( $q ) use ( $active_categories, $active_t
 
 <?php
 do_action( 'woocommerce_after_main_content' );
-
 get_footer( 'shop' );
