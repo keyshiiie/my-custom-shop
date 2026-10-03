@@ -8,12 +8,11 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<a class="skip-link screen-reader-text" href="#content">
-    <?php esc_html_e( 'Перейти к содержимому', 'your-textdomain' ); ?>
+<a class="screen-reader-text" href="#content">
+    <?php esc_html_e( 'Перейти к содержимому', MY_THEME_TEXTDOMAIN ); ?>
 </a>
 
 <?php
-// Безопасно получаем данные WooCommerce, если он активен
 $cart_url   = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/' );
 $cart_count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 
@@ -40,7 +39,7 @@ if ( function_exists( 'wc_get_page_permalink' ) ) {
         </div>
 
         <!-- 2. ГЛАВНОЕ МЕНЮ -->
-        <nav class="main-navigation" aria-label="<?php esc_attr_e( 'Главное меню', 'your-textdomain' ); ?>">
+        <nav class="main-navigation" aria-label="<?php esc_attr_e( 'Главное меню', MY_THEME_TEXTDOMAIN ); ?>">
             <?php
             wp_nav_menu( [
                 'theme_location' => 'primary',
@@ -59,8 +58,7 @@ if ( function_exists( 'wc_get_page_permalink' ) ) {
                class="header-icon cart-icon"
                aria-label="<?php
                    echo esc_attr( sprintf(
-                       /* translators: %d: количество товаров */
-                       _n( 'Корзина, %d товар', 'Корзина, %d товаров', $cart_count, 'your-textdomain' ),
+                       _n( 'Корзина, %d товар', 'Корзина, %d товаров', $cart_count, MY_THEME_TEXTDOMAIN ),
                        $cart_count
                    ) );
                ?>">
@@ -73,7 +71,6 @@ if ( function_exists( 'wc_get_page_permalink' ) ) {
                     <?php echo esc_html( $cart_count ); ?>
                 </span>
             </a>
-            <!-- Живой регион для озвучки изменений корзины -->
             <span class="screen-reader-text" aria-live="polite" data-cart-announcer></span>
 
             <!-- Кнопка Войти / Личный кабинет -->
@@ -110,7 +107,7 @@ if ( function_exists( 'wc_get_page_permalink' ) ) {
                 <?php else : ?>
                     <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/icon-login.svg' ); ?>"
                          alt="" aria-hidden="true">
-                    <?php esc_html_e( 'Войти', 'your-textdomain' ); ?>
+                    <?php esc_html_e( 'Войти', MY_THEME_TEXTDOMAIN ); ?>
                 <?php endif; ?>
             </a>
         </div>

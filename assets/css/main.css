@@ -1,4 +1,6 @@
-/* ПОДКЛЮЧЕНИЕ ШРИФТА */
+/* ============================================
+   FONT
+   ============================================ */
 @font-face {
     font-family: 'Manrope';
     src: url('../fonts/manrope/Manrope-VariableFont_wght.woff2') format('woff2-variations'),
@@ -9,7 +11,9 @@
     font-display: swap;
 }
 
-/* СБРОС И БАЗОВЫЕ НАСТРОЙКИ */
+/* ============================================
+   RESET / BASE
+   ============================================ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -40,15 +44,49 @@ img {
     display: block;
 }
 
-/* КОНТЕЙНЕР */
+/* ============================================
+   CONTAINER
+   ============================================ */
 .container {
     max-width: 1140px;
     margin: 0 auto;
-    padding: 0 0; 
+    padding: 0;
 }
 
-/* БАЗОВЫЙ КЛАСС КНОПКИ
-   (без размеров и отступов — они будут в секциях) */
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Визуально скрытый, но доступный скринридерам текст.
+   Используется для skip-link, aria-live и подписей иконок. */
+.screen-reader-text {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* При фокусе — показываем как обычный блок (для skip-link). */
+.screen-reader-text:focus {
+    position: static !important;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 10px 15px;
+    background: #fff;
+    color: #000;
+    clip: auto;
+    z-index: 9999;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -61,10 +99,9 @@ img {
     transition: all 0.3s ease;
     cursor: pointer;
     border: 1px solid transparent;
-    padding: 10px 20px;   /* базовый padding */
+    padding: 10px 20px;
 }
 
-/* ТЁМНАЯ КНОПКА */
 .btn-dark {
     background: #121419;
     color: #fff;
@@ -74,7 +111,6 @@ img {
     background: #454545;
 }
 
-/* КНОПКА БЕЗ ФОНА */
 .btn-outline {
     background: transparent;
     color: #121419;
@@ -85,7 +121,15 @@ img {
     background: #F5F5F5;
 }
 
-/* СОСТАВНАЯ КНОПКА "В КАТАЛОГ" */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    height: 40px;
+}
+
+/* ============================================
+   COMPOSITE BUTTON (двойная кнопка)
+   ============================================ */
 .composite-btn {
     display: inline-flex;
     align-items: stretch;
@@ -98,7 +142,7 @@ img {
 }
 
 .composite-btn .btn-dark:hover {
-    background: #121419;  
+    background: #121419;
 }
 
 .composite-btn:hover .btn-dark {
@@ -115,7 +159,21 @@ img {
     height: 16px;
 }
 
-/* ЗАГОЛОВОК СЕКЦИИ + ПЛАШКА */
+/* ============================================
+   PAGE TITLE (общий для catalog / cart / product)
+   ============================================ */
+.page-title {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: #121419;
+    margin-bottom: 24px;
+}
+
+/* ============================================
+   SECTION HEADER (badge + title + subtitle)
+   ============================================ */
 .section-header {
     text-align: center;
     margin-bottom: 40px;
@@ -147,62 +205,59 @@ img {
     color: #737373;
 }
 
-/* Скрываем нативную ссылку WooCommerce "Просмотр корзины" */
-.product-card .added_to_cart {
+/* ============================================
+   PRODUCTS GRID (3 колонки, каталог + related)
+   ============================================ */
+.products-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+.products-grid::before,
+.products-grid::after {
+    content: none !important;
     display: none !important;
 }
 
-/* SCROLL REVEAL — появление блоков при скролле*/
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition:
-        opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: opacity, transform;
-}
-
-.reveal.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Варианты появления */
-.reveal--fade {
-    transform: none;              /* без сдвига — просто появление */
-}
-
-.reveal--left {
-    transform: translateX(-40px);
-}
-
-.reveal--right {
-    transform: translateX(40px);
-}
-
-.reveal--scale {
-    transform: scale(0.95);
-}
-
-/* Задержки — для последовательного появления группы элементов */
-.reveal--delay-1 { transition-delay: 0.1s; }
-.reveal--delay-2 { transition-delay: 0.2s; }
-.reveal--delay-3 { transition-delay: 0.3s; }
-.reveal--delay-4 { transition-delay: 0.4s; }
-
-/* Если у пользователя отключены анимации — отключаем */
-@media (prefers-reduced-motion: reduce) {
-    .reveal {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
+.products-grid > li,
+.products-grid > li.product,
+.products-grid > li.product-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    float: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clear: none !important;
+    display: block !important;
 }
 
 /* ============================================
-   ХЛЕБНЫЕ КРОШКИ (общие)
+   NOTE BLOCK (серая сноска под блоком)
    ============================================ */
+.note-block {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #737373;
+}
 
+.note-block svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #737373;
+}
+
+/* ============================================
+   BREADCRUMBS
+   ============================================ */
 .breadcrumbs {
     display: flex;
     align-items: center;
@@ -233,4 +288,86 @@ img {
     color: #737373;
     font-size: 16px;
     line-height: 1;
+}
+
+/* ============================================
+   REVEAL — scroll-анимация появления
+   ============================================ */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+        opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal--fade {
+    transform: none;
+}
+
+.reveal--left {
+    transform: translateX(-40px);
+}
+
+.reveal--right {
+    transform: translateX(40px);
+}
+
+.reveal--scale {
+    transform: scale(0.95);
+}
+
+.reveal--delay-1 { transition-delay: 0.1s; }
+.reveal--delay-2 { transition-delay: 0.2s; }
+.reveal--delay-3 { transition-delay: 0.3s; }
+.reveal--delay-4 { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+/* ============================================
+   WOOCOMMERCE — мелкие утилиты
+   ============================================ */
+
+/* Скрываем нативную ссылку WooCommerce «Просмотр корзины». */
+.product-card .added_to_cart {
+    display: none !important;
+}
+
+/* ============================================
+   EMPTY STATE — общий для каталога и корзины
+   ============================================ */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: #737373;
+    grid-column: 1 / -1;
+}
+
+.empty-state p {
+    font-size: 18px;
+    color: #737373;
+    margin-bottom: 20px;
+}
+
+.empty-state .btn {
+    margin-top: 8px;
+    height: 48px;
+    padding: 0 28px;
 }
