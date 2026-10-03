@@ -127,10 +127,11 @@
             if (data.found_posts === 0) {
                 html = '<div class="catalog-empty">По вашему запросу ничего не найдено. Попробуйте изменить фильтры.</div>';
             } else {
-                html = '<ul class="products">' + data.html + '</ul>';
+                // products-grid — общий класс сетки товаров из main.css.
+                // Раньше класс добавлялся фильтром в functions.php,
+                // теперь — прямо здесь, в момент рендера.
+                html = '<ul class="products products-grid">' + data.html + '</ul>';
 
-                // ⚠️ PHP уже оборачивает пагинацию в <nav class="woocommerce-pagination">,
-                // поэтому здесь просто вставляем как есть — без лишней обёртки.
                 if (data.pagination) {
                     html += data.pagination;
                 }
@@ -179,6 +180,67 @@
         }
 
         // --------------------------------------------
+        // Восстановить UI фильтров из URL.
+        // Нужно для popstate (назад/вперёд в браузере) —
+        // чтобы чекбоксы, теги и поля цены отражали URL,
+        // а не то, что осталось в DOM от предыдущего состояния.
+        // --------------------------------------------
+        function restoreFiltersFromUrl(params) {
+            const categories = (params.get('categories') || '').split(',').filter(Boolean);
+            const tags       = (params.get('tags') || '').split(',').filter(Boolean);
+
+            // Категории
+            document.querySelectorAll(
+                '.catalog-filter[data-filter="category"] .catalog-filter__option--checkbox'
+            ).forEach(function (el) {
+                const on = categories.includes(el.dataset.value);
+                el.classList.toggle('is-selected', on);
+                el.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+
+            // Теги
+            document.querySelectorAll(
+                '.catalog-filter[data-filter="tag"] .catalog-tag'
+            ).forEach(function (el) {
+                const on = tags.includes(el.dataset.value);
+                el.classList.toggle('is-selected', on);
+                el.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+
+            // Цена
+            const priceEl = document.querySelector('.catalog-filter[data-filter="price"]');
+            if (priceEl) {
+                const inputs = priceEl.querySelectorAll('.catalog-price__input');
+                if (inputs[0]) inputs[0].value = params.get('price_min') || '';
+                if (inputs[1]) inputs[1].value = params.get('price_max') || '';
+
+                const freeCb = priceEl.querySelector('.catalog-price__free-input');
+                if (freeCb) {
+                    freeCb.checked = !!params.get('free_only');
+                    inputs.forEach(function (i) {
+                        i.disabled = freeCb.checked;
+                    });
+                }
+            }
+
+            // Сортировка
+            const sortValue = params.get('sort') || '';
+            document.querySelectorAll(
+                '.catalog-filter[data-filter="sort"] .catalog-sort'
+            ).forEach(function (el) {
+                const on = el.dataset.value === sortValue;
+                el.classList.toggle('is-selected', on);
+                el.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+
+            // Поиск
+            const searchInput = document.querySelector('.catalog-search__input');
+            if (searchInput) {
+                searchInput.value = params.get('search') || '';
+            }
+        }
+
+        // --------------------------------------------
         // Слушаем события
         // --------------------------------------------
         document.addEventListener('catalog:filter-changed', function () {
@@ -216,16 +278,22 @@
         }
 
         // --------------------------------------------
-        // Назад/вперёд в браузере
+        // Назад/вперёд в браузере.
+        //
+        // Раньше здесь было applyFilters(1) — терялась страница
+        // и состояние фильтров. Теперь читаем URL, восстанавливаем UI
+        // и передаём правильную страницу.
         // --------------------------------------------
-        window.addEventListener('popstate', function (e) {
-            if (e.state && e.state.filters) {
-                applyFilters(1);
-            }
+        window.addEventListener('popstate', function () {
+            const params = new URLSearchParams(window.location.search);
+            const paged  = parseInt(params.get('paged') || '1', 10);
+
+            restoreFiltersFromUrl(params);
+            applyFilters(paged);
         });
 
         // --------------------------------------------
-        // 👇 ЕДИНОЖДЫ навешиваем делегированный обработчик
+        // Единожды навешиваем делегированный обработчик
         // на клики по пагинации (и для PHP-пагинации, и для AJAX-пагинации).
         // Работает без переинициализации после каждого AJAX-запроса.
         // --------------------------------------------

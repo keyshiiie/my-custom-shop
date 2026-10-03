@@ -244,6 +244,29 @@ function my_theme_disable_wc_defaults(): void {
 add_action( 'wp', 'my_theme_disable_wc_defaults' );
 
 /**
+ * Убираем columns-* у <ul class="products"> и добавляем products-grid.
+ *
+ * WooCommerce вешает columns-N исходя из настройки «Колонки» в Customizer,
+ * и его CSS (float) может перебивать нашу grid-сетку. Мы полностью
+ * контролируем сетку через .products-grid (main.css).
+ */
+add_filter( 'woocommerce_product_loop_start', 'my_theme_product_loop_start_class' );
+function my_theme_product_loop_start_class( string $html ): string {
+    // Чистим columns-N на всех страницах, где рендерится products.
+    $html = preg_replace( '/\bcolumns-\d+\b/', '', $html );
+
+    // Добавляем products-grid для каталога и карточки товара (related).
+    if (
+        ( function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() ) )
+        || ( function_exists( 'is_product' ) && is_product() )
+    ) {
+        $html = str_replace( '<ul class="products', '<ul class="products products-grid', $html );
+    }
+
+    return $html;
+}
+
+/**
  * Число товаров на странице каталога (основной запрос).
  *
  * Используем условные теги WooCommerce вместо is_post_type_archive,
