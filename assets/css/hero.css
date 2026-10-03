@@ -24,7 +24,7 @@
     max-height: 24px;
 }
 
-/* Заголовок */
+/* Заголовок — ОДИН раз */
 .hero-title {
     font-size: 72px;
     font-weight: 800;
@@ -34,21 +34,8 @@
 }
 
 /* ============================================
-   ЗАГОЛОВОК
+   HIGHLIGHT С АНИМАЦИЕЙ ПЛАШКИ
    ============================================ */
-.hero-title {
-    font-size: 72px;
-    font-weight: 800;
-    line-height: 100%;
-    margin-bottom: 10px;
-    letter-spacing: 0;
-}
-
-/* ============================================
-   HIGHLIGHT С АНИМАЦИЕЙ ПЛАШКИ (без blur)
-   ============================================ */
-
-/* Внешний контейнер — фиксированная ширина */
 .hero-title .highlight-wrap {
     display: inline-block;
     width: 340px;
@@ -56,7 +43,6 @@
     vertical-align: baseline;
 }
 
-/* Обёртка с чёрной плашкой */
 .hero-title .highlight {
     color: #fff;
     position: relative;
@@ -68,7 +54,6 @@
     vertical-align: baseline;
 }
 
-/* Чёрная плашка */
 .hero-title .highlight::before {
     content: '';
     position: absolute;
@@ -85,7 +70,6 @@
     opacity: 1;
 }
 
-/* Слово внутри */
 .hero-title .highlight__word {
     display: inline-block;
     text-align: center;
@@ -98,7 +82,7 @@
     will-change: opacity, transform;
 }
 
-/* УХОДИТ */
+/* Уходит */
 .hero-title .highlight.is-leaving::before {
     opacity: 0;
     transform: translateY(-14px);
@@ -109,7 +93,7 @@
     transform: translateY(-14px);
 }
 
-/* ПОЯВЛЯЕТСЯ */
+/* Появляется */
 .hero-title .highlight.is-entering::before {
     opacity: 0;
     transform: translateY(14px);
@@ -159,10 +143,9 @@
 .hero-video {
     max-width: 960px;
     margin: 0 auto;
-    /* Начальное состояние — уменьшено и полупрозрачно */
     transform: scale(0.7);
     opacity: 0.6;
-    transition: none;              /* анимацию делает JS через transform */
+    transition: none;
     will-change: transform, opacity;
     transform-origin: center center;
 }

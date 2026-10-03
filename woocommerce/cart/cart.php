@@ -14,7 +14,9 @@ defined( 'ABSPATH' ) || exit;
 
         <!-- Хлебные крошки -->
         <nav class="breadcrumbs reveal reveal--fade">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="breadcrumbs__item">Главная</a>
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="breadcrumbs__item">
+                <?php esc_html_e( 'Главная', MY_THEME_TEXTDOMAIN ); ?>
+            </a>
             <span class="breadcrumbs__sep">›</span>
 
             <?php
@@ -22,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 
             if ( ! $source ) {
                 $source = [
-                    'label' => 'Каталог',
+                    'label' => __( 'Каталог', MY_THEME_TEXTDOMAIN ),
                     'url'   => wc_get_page_permalink( 'shop' ),
                 ];
             }
@@ -35,155 +37,142 @@ defined( 'ABSPATH' ) || exit;
                 <span class="breadcrumbs__sep">›</span>
             <?php endif; ?>
 
-            <span class="breadcrumbs__item breadcrumbs__item--current">Корзина</span>
+            <span class="breadcrumbs__item breadcrumbs__item--current">
+                <?php esc_html_e( 'Корзина', MY_THEME_TEXTDOMAIN ); ?>
+            </span>
         </nav>
 
-        <h1 class="cart-title reveal reveal--fade">Корзина</h1>
+        <h1 class="page-title reveal reveal--fade">
+            <?php esc_html_e( 'Корзина', MY_THEME_TEXTDOMAIN ); ?>
+        </h1>
 
-        <?php if ( WC()->cart->is_empty() ) : ?>
+        <form class="cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
 
-            <div class="cart-empty">
-                <p>Корзина пуста.</p>
-                <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-dark">
-                    В каталог
-                </a>
-            </div>
+            <?php do_action( 'woocommerce_before_cart_table' ); ?>
 
-        <?php else : ?>
+            <div class="cart-layout">
 
-            <form class="cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
+                <!-- ЛЕВАЯ КОЛОНКА -->
+                <div class="cart-main">
 
-                <?php do_action( 'woocommerce_before_cart_table' ); ?>
+                    <!-- Тулбар: выбрать всё + очистить -->
+                    <div class="cart-toolbar reveal reveal--fade">
+                        <label class="cart-select-all">
+                            <input type="checkbox" class="cart-select-all__input" checked>
+                            <span class="cart-select-all__box" aria-hidden="true">
+                                <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span class="cart-select-all__text">
+                                <?php esc_html_e( 'Выбрать всё', MY_THEME_TEXTDOMAIN ); ?>
+                            </span>
+                        </label>
 
-                <div class="cart-layout">
-
-                    <!-- ЛЕВАЯ КОЛОНКА -->
-                    <div class="cart-main">
-
-                        <!-- Тулбар: выбрать всё + очистить -->
-                        <div class="cart-toolbar reveal reveal--fade">
-                            <label class="cart-select-all">
-                                <input type="checkbox" class="cart-select-all__input" checked>
-                                <span class="cart-select-all__box" aria-hidden="true">
-                                    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                                <span class="cart-select-all__text">Выбрать всё</span>
-                            </label>
-
-                            <?php
-                            // wp_nonce_url() добавляет &_wpnonce=...
-                            // my_theme_handle_clear_cart() в functions.php проверяет его.
-                            $clear_url = wp_nonce_url(
-                                add_query_arg( 'clear-cart', '1', wc_get_cart_url() ),
-                                'clear_cart'
-                            );
-                            ?>
-                            <a href="<?php echo esc_url( $clear_url ); ?>"
-                               class="cart-clear"
-                               data-confirm="Очистить корзину?">
-                                Очистить корзину
-                            </a>
-                        </div>
-
-                        <!-- Список товаров -->
-                        <div class="cart-items reveal reveal--fade">
-                            <?php
-                            foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
-                                $_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
-
-                                if ( ! $_product || ! $_product->exists() || $cart_item['quantity'] <= 0 ) {
-                                    continue;
-                                }
-
-                                if ( ! apply_filters( 'woocommerce_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
-                                    continue;
-                                }
-
-                                $product_permalink = apply_filters(
-                                    'woocommerce_cart_item_permalink',
-                                    $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '',
-                                    $cart_item,
-                                    $cart_item_key
-                                );
-
-                                $thumbnail  = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail' ), $cart_item, $cart_item_key );
-                                $short_desc = $_product->get_short_description();
-                                $price_html = WC()->cart->get_product_subtotal( $_product, 1 );
-                                ?>
-                                <div class="cart-item" data-cart-item="<?php echo esc_attr( $cart_item_key ); ?>">
-
-                                    <!-- Чекбокс -->
-                                    <label class="cart-item__check">
-                                        <input type="checkbox"
-                                               class="cart-item__check-input"
-                                               checked
-                                               data-cart-item-check="<?php echo esc_attr( $cart_item_key ); ?>">
-                                        <span class="cart-item__check-box" aria-hidden="true">
-                                            <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </span>
-                                    </label>
-
-                                    <!-- Картинка -->
-                                    <a href="<?php echo esc_url( $product_permalink ); ?>" class="cart-item__image">
-                                        <?php echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                    </a>
-
-                                    <!-- Инфо -->
-                                    <div class="cart-item__info">
-                                        <a href="<?php echo esc_url( $product_permalink ); ?>" class="cart-item__title">
-                                            <?php echo wp_kses_post( $_product->get_name() ); ?>
-                                        </a>
-
-                                        <?php if ( $short_desc ) : ?>
-                                            <p class="cart-item__desc">
-                                                <?php echo wp_kses_post( wp_trim_words( $short_desc, 12 ) ); ?>
-                                            </p>
-                                        <?php endif; ?>
-
-                                        <div class="cart-item__price">
-                                            <?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                        </div>
-                                    </div>
-
-                                    <!-- Удалить -->
-                                    <a href="<?php echo esc_url( wc_get_cart_remove_url( $cart_item_key ) ); ?>"
-                                       class="cart-item__remove"
-                                       aria-label="<?php echo esc_attr( sprintf( 'Удалить «%s» из корзины', $_product->get_name() ) ); ?>"
-                                       data-cart-item-remove>
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M10.75 0.75L0.75 10.75M0.75 0.75L10.75 10.75" stroke="#121419" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                                <?php
-                            endforeach;
-                            ?>
-                        </div>
-
-                        <?php do_action( 'woocommerce_cart_contents' ); ?>
-
-                        <!-- Скрытая кнопка обновления корзины: нужна для nonce и хуков -->
-                        <button type="submit" class="cart-update-hidden" name="update_cart" value="1" hidden></button>
-                        <?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
-
-                        <?php do_action( 'woocommerce_after_cart_contents' ); ?>
+                        <?php
+                        $clear_url = wp_nonce_url(
+                            add_query_arg( 'clear-cart', '1', wc_get_cart_url() ),
+                            'clear_cart'
+                        );
+                        ?>
+                        <a href="<?php echo esc_url( $clear_url ); ?>"
+                           class="cart-clear"
+                           data-confirm="<?php esc_attr_e( 'Очистить корзину?', MY_THEME_TEXTDOMAIN ); ?>">
+                            <?php esc_html_e( 'Очистить корзину', MY_THEME_TEXTDOMAIN ); ?>
+                        </a>
                     </div>
 
-                    <!-- ПРАВАЯ КОЛОНКА -->
-                    <aside class="cart-summary reveal reveal--fade">
-                        <?php woocommerce_cart_totals(); ?>
-                    </aside>
+                    <!-- Список товаров -->
+                    <div class="cart-items reveal reveal--fade">
+                        <?php
+                        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
+                            $_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
 
+                            if ( ! $_product || ! $_product->exists() || $cart_item['quantity'] <= 0 ) {
+                                continue;
+                            }
+
+                            if ( ! apply_filters( 'woocommerce_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
+                                continue;
+                            }
+
+                            $product_permalink = apply_filters(
+                                'woocommerce_cart_item_permalink',
+                                $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '',
+                                $cart_item,
+                                $cart_item_key
+                            );
+
+                            $thumbnail  = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail' ), $cart_item, $cart_item_key );
+                            $short_desc = $_product->get_short_description();
+                            $price_html = WC()->cart->get_product_subtotal( $_product, 1 );
+                            ?>
+                            <div class="cart-item" data-cart-item="<?php echo esc_attr( $cart_item_key ); ?>">
+
+                                <label class="cart-item__check">
+                                    <input type="checkbox"
+                                           class="cart-item__check-input"
+                                           checked
+                                           data-cart-item-check="<?php echo esc_attr( $cart_item_key ); ?>">
+                                    <span class="cart-item__check-box" aria-hidden="true">
+                                        <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                </label>
+
+                                <a href="<?php echo esc_url( $product_permalink ); ?>" class="cart-item__image">
+                                    <?php echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                </a>
+
+                                <div class="cart-item__info">
+                                    <a href="<?php echo esc_url( $product_permalink ); ?>" class="cart-item__title">
+                                        <?php echo wp_kses_post( $_product->get_name() ); ?>
+                                    </a>
+
+                                    <?php if ( $short_desc ) : ?>
+                                        <p class="cart-item__desc">
+                                            <?php echo wp_kses_post( wp_trim_words( $short_desc, 12 ) ); ?>
+                                        </p>
+                                    <?php endif; ?>
+
+                                    <div class="cart-item__price">
+                                        <?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                    </div>
+                                </div>
+
+                                <a href="<?php echo esc_url( wc_get_cart_remove_url( $cart_item_key ) ); ?>"
+                                   class="cart-item__remove"
+                                   aria-label="<?php echo esc_attr( sprintf( __( 'Удалить «%s» из корзины', MY_THEME_TEXTDOMAIN ), $_product->get_name() ) ); ?>"
+                                   data-cart-item-remove>
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path d="M10.75 0.75L0.75 10.75M0.75 0.75L10.75 10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <?php
+                        endforeach;
+                        ?>
+                    </div>
+
+                    <?php do_action( 'woocommerce_cart_contents' ); ?>
+
+                    <!-- Скрытая кнопка обновления корзины (nonce + хуки) -->
+                    <button type="submit" class="cart-update-hidden" name="update_cart" value="1" hidden></button>
+                    <?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
+
+                    <?php do_action( 'woocommerce_after_cart_contents' ); ?>
                 </div>
 
-                <?php do_action( 'woocommerce_after_cart_table' ); ?>
-            </form>
+                <!-- ПРАВАЯ КОЛОНКА -->
+                <aside class="cart-summary reveal reveal--fade">
+                    <?php woocommerce_cart_totals(); ?>
+                </aside>
 
-        <?php endif; ?>
+            </div>
+
+            <?php do_action( 'woocommerce_after_cart_table' ); ?>
+        </form>
 
     </div>
 </div>

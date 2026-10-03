@@ -9,7 +9,6 @@
 /* ============================================
    ВЕРХНИЙ БЛОК
    ============================================ */
-
 .product-single__top {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -17,7 +16,7 @@
     margin-bottom: 70px;
 }
 
-/* ГАЛЕРЕЯ */
+/* --- Галерея --- */
 .product-gallery {
     display: flex;
     flex-direction: column;
@@ -79,14 +78,13 @@
     border-color: #737373;
 }
 
-/* ИНФО */
+/* --- Инфо --- */
 .product-info {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* Теги */
 .product-info__tags {
     display: flex;
     gap: 8px;
@@ -111,7 +109,6 @@
     background: #C5DCFF;
 }
 
-/* Название */
 .product-info__title {
     font-size: 48px;
     font-weight: 800;
@@ -121,7 +118,6 @@
     margin: 0;
 }
 
-/* Короткое описание */
 .product-info__excerpt {
     font-size: 16px;
     color: #737373;
@@ -133,7 +129,6 @@
     margin: 0;
 }
 
-/* Цена */
 .product-info__price {
     font-size: 36px;
     font-weight: 800;
@@ -153,7 +148,7 @@
     text-decoration: none;
 }
 
-/* Кнопка «В корзину» */
+/* Кнопка «В корзину» в одиночном товаре */
 .product-info__cart {
     margin-top: 8px;
 }
@@ -181,7 +176,7 @@
 }
 
 .product-info__cart .quantity {
-    display: none; /* скрываем количество — в макете его нет */
+    display: none;
 }
 
 /* Плашки Формат / Лицензия */
@@ -221,7 +216,6 @@
 /* ============================================
    ОПИСАНИЕ + СОСТАВ НАБОРА
    ============================================ */
-
 .product-single__details {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -256,7 +250,6 @@
     margin: 0;
 }
 
-/* Состав набора */
 .product-composition__list {
     list-style: none;
     margin: 0;
@@ -295,12 +288,11 @@
 /* ============================================
    RELATED — «Вам может понравиться»
    ============================================ */
-
-.product-page .related.products {
+.related.products {
     margin-top: 80px;
 }
 
-.product-page .related.products > h2 {
+.related.products > h2 {
     font-size: 42px;
     font-weight: 800;
     line-height: 1.1;
@@ -309,28 +301,17 @@
     margin: 0 0 32px;
 }
 
-.product-page .related.products ul.products {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 24px !important;
+/* .related.products .products-grid — сетка из main.css.
+   Здесь только сброс WooCommerce-классов, если они пришли. */
+.related.products ul.products {
     list-style: none !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
-.product-page .related.products ul.products li.product {
-    width: 100% !important;
-    max-width: 100% !important;
-    float: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    clear: none !important;
-}
-
 /* ============================================
    АДАПТИВ
    ============================================ */
-
 @media (max-width: 1024px) {
     .product-single__top {
         grid-template-columns: 1fr;
@@ -348,12 +329,12 @@
 
     .product-single__details .product-description__title,
     .product-composition__title,
-    .product-page .related.products > h2 {
+    .related.products > h2 {
         font-size: 28px;
     }
 
-    .product-page .related.products ul.products {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }
 
@@ -379,63 +360,7 @@
         height: 80px;
     }
 
-    .product-page .related.products ul.products {
+    .products-grid {
         grid-template-columns: 1fr !important;
     }
-}
-
-/* ============================================
-   RELATED — «Вам может понравиться»
-   ============================================ */
-
-section.related.products,
-.related.products {
-    margin-top: 80px;
-}
-
-section.related.products > h2,
-.related.products > h2 {
-    font-size: 42px;
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1.5px;
-    color: #000;
-    margin: 0 0 32px;
-}
-
-/* Сетка: 3 колонки — на любой ul.products внутри related */
-.related.products ul.products,
-ul.products.related-products-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 24px !important;
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    clear: both !important;
-    overflow: visible !important;
-}
-
-/* Каждый элемент — grid-item */
-.related.products ul.products > li,
-.related.products ul.products > li.product,
-.related.products ul.products > li.product-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    float: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    clear: none !important;
-    display: block !important;
-}
-
-/* Убираем псевдо-элементы WooCommerce, которые ломают grid */
-.related.products ul.products::before,
-.related.products ul.products::after,
-.related.products ul.products > li::before,
-.related.products ul.products > li::after {
-    content: none !important;
-    display: none !important;
 }
